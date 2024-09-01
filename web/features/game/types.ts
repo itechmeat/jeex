@@ -1,0 +1,28 @@
+export type ChipType = 'attacker' | 'runner' | 'enemy';
+export interface Coordinates {
+  x: number;
+  y: number;
+}
+
+export interface ApiGame {
+  id: string;
+  created_by: string; // UUID
+  created_at: string; // DATE
+  started_at: string; // DATE
+  status: 'waiting' | 'active' | 'finished';
+}
+
+export interface Chip {
+  id: string;
+  type: ChipType;
+  coordinates: Coordinates;
+  score: number;
+}
+
+export interface PlayerChips {
+  player_id: number;
+  attacker_coord: string;
+  attacker_points: number;
+  runner_coord: string;
+  runner_points: number;
+}
