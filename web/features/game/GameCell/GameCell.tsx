@@ -1,5 +1,4 @@
-import { FC } from 'react';
-import GameChip from '../GameChip/GameChip';
+import { FC, PropsWithChildren } from 'react';
 import { Chip } from '../types';
 import styles from './GameCell.module.scss';
 
@@ -11,13 +10,12 @@ interface GameCellProps {
   attackers: number;
   runners: number;
   isRoundActive: boolean;
-  isAttackerDone: boolean;
-  isRunnerDone: boolean;
   isAdjacentCell: boolean;
   onCellClick: (x: number, y: number) => void;
 }
 
-const GameCell: FC<GameCellProps> = ({
+const GameCell: FC<PropsWithChildren<GameCellProps>> = ({
+  children,
   x,
   y,
   cell,
@@ -25,8 +23,6 @@ const GameCell: FC<GameCellProps> = ({
   attackers,
   runners,
   isRoundActive,
-  isAttackerDone,
-  isRunnerDone,
   isAdjacentCell,
   onCellClick,
 }) => {
@@ -71,17 +67,8 @@ const GameCell: FC<GameCellProps> = ({
             />
           ))}
 
-      {cell && (
-        <GameChip
-          variant={cell.type}
-          isActive={activeChip?.id === cell.id}
-          isDisabled={
-            !isRoundActive ||
-            (isRunnerDone && cell.type === 'runner') ||
-            (isAttackerDone && cell.type === 'attacker')
-          }
-        />
-      )}
+      {children}
+
       <div className={styles.coord}>{`${String.fromCharCode(65 + y)}${
         x + 1
       }`}</div>

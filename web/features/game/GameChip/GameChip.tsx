@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import { ChipType } from '../types';
 import styles from './GameChip.module.scss';
 import cn from 'classnames';
@@ -9,10 +9,11 @@ interface GameChipProps {
   isDisabled: boolean;
 }
 
-const GameChip: React.FC<GameChipProps> = ({
+const GameChip: React.FC<PropsWithChildren<GameChipProps>> = ({
   variant,
   isActive,
   isDisabled,
+  children,
 }) => {
   return (
     <div
@@ -20,7 +21,9 @@ const GameChip: React.FC<GameChipProps> = ({
         [styles.active]: isActive,
         [styles.disabled]: isDisabled,
       })}
-    />
+    >
+      {children}
+    </div>
   );
 };
 

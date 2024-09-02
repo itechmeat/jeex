@@ -13,8 +13,9 @@ import { useGameState } from '../hooks/useGameState';
 import { useGameTimer } from '../hooks/useGameTimer';
 
 const ROUND_DURATION = 10000;
-const ROUND_BREAK_DURATION = 5000;
+const ROUND_BREAK_DURATION = 2000;
 const TOTAL_ROUNDS = 10;
+const GAMERS_COUNT = 99;
 
 interface GameWrapperProps {
   game: ApiGame;
@@ -22,9 +23,8 @@ interface GameWrapperProps {
 
 const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
   const [players, setPlayers] = useState<PlayerChips[]>(() =>
-    generateGameInitialPlayers(99)
+    generateGameInitialPlayers(GAMERS_COUNT)
   );
-  // console.log('🚀 ~ players:', players);
 
   const {
     chips,
@@ -61,6 +61,7 @@ const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
     if (currentRound > 0) {
       setPlayers(updatePlayerPositions(players));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRound, setIsGameActive]);
 
   useEffect(() => {

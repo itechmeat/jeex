@@ -1,4 +1,7 @@
 .chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   z-index: 20;
   top: 5%;
@@ -20,20 +23,20 @@
 }
 
 .attacker {
-  border-color: #f29ba8;
-  background-color: #862a35;
+  border-color: #f087ff;
+  background-color: #6e1fce;
 
   &.disabled {
-    border-color: #904d56;
+    border-color: #4f1398;
   }
 }
 
 .runner {
-  border-color: #49bcdc;
-  background-color: #23536c;
+  border-color: #19fb9b;
+  background-color: #005f59;
 
   &.disabled {
-    border-color: #166175;
+    border-color: #023c38;
   }
 }
 

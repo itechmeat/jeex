@@ -2,6 +2,7 @@ import { useState, useEffect, FC } from 'react';
 import { Chip, ChipType, Coordinates, PlayerChips } from '../types';
 import styles from './GameBoard.module.scss';
 import GameCell from '../GameCell/GameCell';
+import GameChip from '../GameChip/GameChip';
 
 interface GameBoardProps {
   chips: Chip[];
@@ -115,7 +116,6 @@ const GameBoard: FC<GameBoardProps> = ({
 
   const handleCellClick = (x: number, y: number) => {
     if (!isRoundActive) return;
-    console.log('🚀 ~ handleCellClick ~ activeChip:', activeChip);
     if (
       (activeChip?.type === 'attacker' && isAttackerDone) ||
       (activeChip?.type === 'runner' && isRunnerDone)
@@ -184,47 +184,61 @@ const GameBoard: FC<GameBoardProps> = ({
             : 'Round is finished'}
         </div>
       </div>
-      <div className={styles.field}>
-        <div className={styles.grid}>
-          {boardState.map((row, y) => (
-            <div key={y} className={styles.row}>
-              {row.map((cell, x) => (
-                <GameCell
-                  key={`${x}-${y}`}
-                  x={x}
-                  y={y}
-                  cell={cell}
-                  attackers={
-                    players.filter(
-                      (player) =>
-                        player.attacker_coord ===
-                        `${String.fromCharCode(65 + y)}${x + 1}`
-                    ).length
-                  }
-                  runners={
-                    players.filter(
-                      (player) =>
-                        player.runner_coord ===
-                        `${String.fromCharCode(65 + y)}${x + 1}`
-                    ).length
-                  }
-                  activeChip={activeChip}
-                  isRoundActive={isRoundActive}
-                  isAttackerDone={isAttackerDone}
-                  isRunnerDone={isRunnerDone}
-                  isAdjacentCell={
-                    activeChip
-                      ? isAdjacentCell(activeChip.coordinates, { x, y })
-                      : false
-                  }
-                  onCellClick={handleCellClick}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-
+      <div className={styles.area}>
         <div className={styles.light} />
+
+        <div className={styles.field}>
+          <div className={styles.grid}>
+            {boardState.map((row, y) => (
+              <div key={y} className={styles.row}>
+                {row.map((cell, x) => (
+                  <GameCell
+                    key={`${x}-${y}`}
+                    x={x}
+                    y={y}
+                    cell={cell}
+                    attackers={
+                      players.filter(
+                        (player) =>
+                          player.attacker_coord ===
+                          `${String.fromCharCode(65 + y)}${x + 1}`
+                      ).length
+                    }
+                    runners={
+                      players.filter(
+                        (player) =>
+                          player.runner_coord ===
+                          `${String.fromCharCode(65 + y)}${x + 1}`
+                      ).length
+                    }
+                    activeChip={activeChip}
+                    isRoundActive={isRoundActive}
+                    isAdjacentCell={
+                      activeChip
+                        ? isAdjacentCell(activeChip.coordinates, { x, y })
+                        : false
+                    }
+                    onCellClick={handleCellClick}
+                  >
+                    {cell && (
+                      <GameChip
+                        variant={cell.type}
+                        isActive={activeChip?.id === cell.id}
+                        isDisabled={
+                          !isRoundActive ||
+                          (isRunnerDone && cell.type === 'runner') ||
+                          (isAttackerDone && cell.type === 'attacker')
+                        }
+                      >
+                        {cell.score}
+                      </GameChip>
+                    )}
+                  </GameCell>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

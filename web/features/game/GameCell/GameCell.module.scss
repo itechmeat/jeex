@@ -7,7 +7,7 @@
   position: relative;
   width: 48px;
   height: 48px;
-  background: #405364;
+  background: rgba(#fff, 0.1);
   clip-path: polygon(
     var(--cell--corner) 0%,
     var(--cell--corner-anti) 0%,
@@ -46,13 +46,13 @@
 
   &.highlight-runner {
     &::before {
-      box-shadow: inset 0 0 4px #49bcdc;
+      box-shadow: inset 0 0 4px #14f195;
     }
   }
 
   &.highlight-attacker {
     &::before {
-      box-shadow: inset 0 0 4px #f29ba8;
+      box-shadow: inset 0 0 4px #9945ff;
     }
   }
 }
@@ -103,13 +103,12 @@
   height: 8px;
   border-radius: 50%;
   transition: top 1s linear, left 1s linear;
-  // filter: blur(4px);
 }
 
 .attacker {
-  background: #f29ba8;
+  background: #c766ef;
 }
 
 .runner {
-  background: #49bcdc;
+  background: #14f195;
 }
