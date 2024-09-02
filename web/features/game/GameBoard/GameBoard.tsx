@@ -236,9 +236,7 @@ const GameBoard: FC<GameBoardProps> = ({
                           (isRunnerDone && cell.type === 'runner') ||
                           (isAttackerDone && cell.type === 'attacker')
                         }
-                      >
-                        {cell.score}
-                      </GameChip>
+                      />
                     )}
                   </GameCell>
                 ))}

@@ -7,6 +7,7 @@ import {
   convertCoordToXY,
   convertXYToCoord,
   generateGameInitialPlayers,
+  recalculateScores,
   updatePlayerPositions,
 } from '../utils';
 import { useGameState } from '../hooks/useGameState';
@@ -59,10 +60,28 @@ const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
 
   useEffect(() => {
     if (currentRound > 0) {
-      setPlayers(updatePlayerPositions(players));
+      // Update positions only for generated players
+      const updatedPlayers = players.map((player, index) =>
+        index >= 2 ? updatePlayerPositions([player])[0] : player
+      );
+      const recalculatedPlayers = recalculateScores(updatedPlayers);
+      setPlayers(recalculatedPlayers);
+
+      // Update chips for the main player
+      setChips((prevChips) =>
+        prevChips.map((chip) => {
+          const playerIndex = chip.type === 'attacker' ? 0 : 1;
+          return {
+            ...chip,
+            score:
+              chip.type === 'attacker'
+                ? recalculatedPlayers[playerIndex].attacker_points
+                : recalculatedPlayers[playerIndex].runner_points,
+          };
+        })
+      );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentRound, setIsGameActive]);
+  }, [currentRound]);
 
   useEffect(() => {
     if (currentRound === 0 && chips.length === 0) {
@@ -87,6 +106,7 @@ const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
       runnerCoords: Coordinates,
       moving: Chip['type']
     ) => {
+      // Update chip positions
       setChips((prevChips) =>
         prevChips.map((chip) =>
           chip.type === 'attacker'
@@ -97,6 +117,7 @@ const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
         )
       );
 
+      // Mark the moved chip as done
       if (moving === 'attacker') {
         setIsAttackerDone(true);
       }
@@ -104,8 +125,9 @@ const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
         setIsRunnerDone(true);
       }
 
-      setPlayers((prevPlayers) =>
-        prevPlayers.map((player, index) =>
+      // Update player positions and recalculate scores
+      setPlayers((prevPlayers) => {
+        const updatedPlayers = prevPlayers.map((player, index) =>
           index < 2
             ? {
                 ...player,
@@ -113,8 +135,9 @@ const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
                 runner_coord: convertXYToCoord(runnerCoords),
               }
             : player
-        )
-      );
+        );
+        return recalculateScores(updatedPlayers);
+      });
     },
     [setChips, setIsAttackerDone, setIsRunnerDone]
   );
