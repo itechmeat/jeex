@@ -1,0 +1,57 @@
+.stat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10%;
+  width: 100%;
+  margin: 24px 0;
+}
+
+.attacker,
+.runner,
+.sum {
+  flex: 0 0 20%;
+  text-align: left;
+}
+
+.label {
+  color: #9d9dae;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.score {
+  color: transparent;
+  font-size: 40px;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-clip: text;
+
+  .attacker & {
+    background-image: linear-gradient(
+      100.51deg,
+      #f087ff 27.61%,
+      #6e1fce 62.14%,
+      rgba(110, 31, 206, 0.1) 113.78%
+    );
+  }
+
+  .runner & {
+    background-image: linear-gradient(
+      97.65deg,
+      #19fb9b 11.36%,
+      #199890 54.3%,
+      #005f59 100.78%
+    );
+  }
+
+  .sum & {
+    background-image: linear-gradient(
+      100.22deg,
+      #1fcff1 30.11%,
+      #234cb6 66.43%,
+      rgba(35, 76, 182, 0.1) 120.76%
+    );
+  }
+}

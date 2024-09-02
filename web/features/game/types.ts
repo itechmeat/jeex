@@ -26,3 +26,8 @@ export interface PlayerChips {
   runner_coord: string;
   runner_points: number;
 }
+
+export interface PlayerChipsSet {
+  attacker: Chip | null;
+  runner: Chip | null;
+}

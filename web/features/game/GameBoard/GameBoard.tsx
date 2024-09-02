@@ -1,8 +1,15 @@
 import { useState, useEffect, FC } from 'react';
-import { Chip, ChipType, Coordinates, PlayerChips } from '../types';
+import {
+  Chip,
+  ChipType,
+  Coordinates,
+  PlayerChips,
+  PlayerChipsSet,
+} from '../types';
 import styles from './GameBoard.module.scss';
 import GameCell from '../GameCell/GameCell';
 import GameChip from '../GameChip/GameChip';
+import GameStat from '../GameStat/GameStat';
 
 interface GameBoardProps {
   chips: Chip[];
@@ -36,10 +43,7 @@ const GameBoard: FC<GameBoardProps> = ({
   timeLeft,
 }) => {
   const [activeChip, setActiveChip] = useState<Chip | null>(null);
-  const [playerChips, setPlayerChips] = useState<{
-    attacker: Chip | null;
-    runner: Chip | null;
-  }>({
+  const [playerChips, setPlayerChips] = useState<PlayerChipsSet>({
     attacker: null,
     runner: null,
   });
@@ -175,7 +179,7 @@ const GameBoard: FC<GameBoardProps> = ({
   return (
     <div className={styles.gameBoard}>
       <div className={styles.info}>
-        <div className={styles.round}>Round: {currentRound + 1}</div>
+        <div className={styles.round}>Round {currentRound + 1}</div>
         <div className={styles.timer}>
           {timeLeft > 0
             ? `${timeLeft} seconds until the ${
@@ -184,6 +188,9 @@ const GameBoard: FC<GameBoardProps> = ({
             : 'Round is finished'}
         </div>
       </div>
+
+      <GameStat playerChips={playerChips} />
+
       <div className={styles.area}>
         <div className={styles.light} />
 
