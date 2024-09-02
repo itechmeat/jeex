@@ -34,10 +34,6 @@ const GameBoard: FC<GameBoardProps> = ({
   isRoundActive,
   timeLeft,
 }) => {
-  // const attackers = players.map((player) => {
-
-  // });
-
   const [activeChip, setActiveChip] = useState<Chip | null>(null);
   const [playerChips, setPlayerChips] = useState<{
     attacker: Chip | null;

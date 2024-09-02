@@ -46,7 +46,7 @@ const GameCell: FC<GameCellProps> = ({
       {attackers > 0 &&
         Array(attackers)
           .fill(null)
-          .map((index) => (
+          .map((_, index) => (
             <div
               key={index}
               className={styles.attacker}
@@ -60,7 +60,7 @@ const GameCell: FC<GameCellProps> = ({
       {runners > 0 &&
         Array(runners)
           .fill(null)
-          .map((index) => (
+          .map((_, index) => (
             <div
               key={index}
               className={styles.runner}

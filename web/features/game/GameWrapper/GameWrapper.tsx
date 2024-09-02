@@ -3,7 +3,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import GameBoard from '@/features/game/GameBoard/GameBoard';
 import { ApiGame, Chip, Coordinates, PlayerChips } from '@/features/game/types';
-import { generateGameInitialPlayers } from '../utils';
+import {
+  convertCoordToXY,
+  convertXYToCoord,
+  generateGameInitialPlayers,
+  updatePlayerPositions,
+} from '../utils';
 import { useGameState } from '../hooks/useGameState';
 import { useGameTimer } from '../hooks/useGameTimer';
 
@@ -19,6 +24,7 @@ const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
   const [players, setPlayers] = useState<PlayerChips[]>(() =>
     generateGameInitialPlayers(99)
   );
+  // console.log('🚀 ~ players:', players);
 
   const {
     chips,
@@ -50,6 +56,12 @@ const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
     ROUND_BREAK_DURATION,
     TOTAL_ROUNDS,
   });
+
+  useEffect(() => {
+    if (currentRound > 0) {
+      setPlayers(updatePlayerPositions(players));
+    }
+  }, [currentRound, setIsGameActive]);
 
   useEffect(() => {
     if (currentRound === 0 && chips.length === 0) {
@@ -91,7 +103,6 @@ const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
         setIsRunnerDone(true);
       }
 
-      // Update players state
       setPlayers((prevPlayers) =>
         prevPlayers.map((player, index) =>
           index < 2
@@ -127,7 +138,6 @@ const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
 
   return (
     <div>
-      <h1>Chain Charge</h1>
       <GameBoard
         chips={chips}
         roundStartTime={roundStartTime}
@@ -144,14 +154,5 @@ const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
     </div>
   );
 };
-
-// Helper functions
-const convertCoordToXY = (coord: string): Coordinates => ({
-  x: parseInt(coord.slice(1)) - 1,
-  y: coord.charCodeAt(0) - 65,
-});
-
-const convertXYToCoord = (xy: Coordinates): string =>
-  `${String.fromCharCode(65 + xy.y)}${xy.x + 1}`;
 
 export default GameWrapper;
