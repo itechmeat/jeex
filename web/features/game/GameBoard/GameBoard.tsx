@@ -17,6 +17,8 @@ interface GameBoardProps {
     moving: Chip['type']
   ) => void;
   onInitialPlacement: (attackerChip: Chip, runnerChip: Chip) => void;
+  isRoundActive: boolean;
+  timeLeft: number;
 }
 
 const GameBoard: FC<GameBoardProps> = ({
@@ -29,6 +31,8 @@ const GameBoard: FC<GameBoardProps> = ({
   players,
   onMoveMade,
   onInitialPlacement,
+  isRoundActive,
+  timeLeft,
 }) => {
   // const attackers = players.map((player) => {
 
@@ -47,30 +51,6 @@ const GameBoard: FC<GameBoardProps> = ({
       .fill(null)
       .map(() => Array(10).fill(null))
   );
-  const [timeLeft, setTimeLeft] = useState<number>(0);
-  const [isRoundActive, setIsRoundActive] = useState<boolean>(false);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = Date.now();
-      if (now < roundStartTime) {
-        setTimeLeft(Math.ceil((roundStartTime - now) / 1000));
-        setIsRoundActive(false);
-        setActiveChip(null);
-      } else if (now < roundEndTime) {
-        setTimeLeft(Math.ceil((roundEndTime - now) / 1000));
-        setIsRoundActive(true);
-      } else {
-        setTimeLeft(0);
-        setIsRoundActive(false);
-        setActiveChip(null);
-      }
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [roundStartTime, roundEndTime]);
 
   useEffect(() => {
     const newBoardState = Array(10)
