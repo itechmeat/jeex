@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, FC } from 'react';
 import GameBoard from '@/features/game/GameBoard/GameBoard';
 import { ApiGame, Chip, Coordinates, PlayerChips } from '@/features/game/types';
 import {
@@ -23,7 +24,7 @@ interface GameWrapperProps {
   game: ApiGame;
 }
 
-const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
+const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
   const [players, setPlayers] = useState<PlayerChips[]>(() =>
     generateGameInitialPlayers(GAMERS_COUNT)
   );
@@ -82,6 +83,7 @@ const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
         })
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRound]);
 
   useEffect(() => {

@@ -171,3 +171,12 @@ export function recalculateScores(players: PlayerChips[]): PlayerChips[] {
     runner_points: Math.max(Math.round(player.runner_points * 100) / 100, 0),
   }));
 }
+
+export const isAdjacentCell = (
+  coord1: Coordinates,
+  coord2: Coordinates
+): boolean => {
+  const dx = Math.abs(coord1.x - coord2.x);
+  const dy = Math.abs(coord1.y - coord2.y);
+  return dx <= 1 && dy <= 1 && !(dx === 0 && dy === 0);
+};
