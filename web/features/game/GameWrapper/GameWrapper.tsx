@@ -12,6 +12,7 @@ import {
 } from '../utils';
 import { useGameState } from '../hooks/useGameState';
 import { useGameTimer } from '../hooks/useGameTimer';
+import GameLeaderBoard from '../GameLeaderBoard/GameLeaderBoard';
 
 const ROUND_DURATION = 10000;
 const ROUND_BREAK_DURATION = 2000;
@@ -157,7 +158,11 @@ const GameWrapper: React.FC<GameWrapperProps> = ({ game }) => {
   }, [isRoundActive, setIsAttackerDone, setIsRunnerDone]);
 
   if (!isGameActive) {
-    return <div>Game over!</div>;
+    const realPlayer = {
+      attacker: chips.find((chip) => chip.type === 'attacker')!,
+      runner: chips.find((chip) => chip.type === 'runner')!,
+    };
+    return <GameLeaderBoard players={players} realPlayer={realPlayer} />;
   }
 
   return (
