@@ -1,11 +1,10 @@
-import { FC, PropsWithChildren } from 'react';
+import { FC } from 'react';
 import { Chip } from '../types';
 import styles from './GameCell.module.scss';
 
 interface GameCellProps {
   x: number;
   y: number;
-  cell: Chip | null;
   activeChip: Chip | null;
   attackers: number;
   runners: number;
@@ -14,11 +13,9 @@ interface GameCellProps {
   onCellClick: (x: number, y: number) => void;
 }
 
-const GameCell: FC<PropsWithChildren<GameCellProps>> = ({
-  children,
+const GameCell: FC<GameCellProps> = ({
   x,
   y,
-  cell,
   activeChip,
   attackers,
   runners,
@@ -31,7 +28,7 @@ const GameCell: FC<PropsWithChildren<GameCellProps>> = ({
   return (
     <div
       className={`${styles.cell} ${
-        activeChip && isAdjacentCell && isRoundActive && !cell
+        activeChip && isAdjacentCell && isRoundActive
           ? styles[`highlight-${activeChip.type}`]
           : ''
       }`}
@@ -66,8 +63,6 @@ const GameCell: FC<PropsWithChildren<GameCellProps>> = ({
               }}
             />
           ))}
-
-      {children}
 
       <div className={styles.coord}>{`${String.fromCharCode(65 + y)}${
         x + 1

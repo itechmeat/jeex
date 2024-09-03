@@ -18,7 +18,7 @@ import GameLeaderBoard from '../GameLeaderBoard/GameLeaderBoard';
 const ROUND_DURATION = 10000;
 const ROUND_BREAK_DURATION = 2000;
 const TOTAL_ROUNDS = 10;
-const GAMERS_COUNT = 99;
+const GAMERS_COUNT = 9;
 
 interface GameWrapperProps {
   game: ApiGame;

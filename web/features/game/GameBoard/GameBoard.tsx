@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { useState, useEffect, FC, useRef } from 'react';
 import {
   Chip,
   ChipType,
@@ -53,6 +53,25 @@ const GameBoard: FC<GameBoardProps> = ({
       .fill(null)
       .map(() => Array(10).fill(null))
   );
+  const [cellSize, setCellSize] = useState(0);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const calculateCellSize = () => {
+      if (gridRef.current) {
+        const gridWidth = gridRef.current.offsetWidth;
+        const calculatedCellSize = gridWidth / 10;
+        setCellSize(calculatedCellSize);
+      }
+    };
+
+    calculateCellSize();
+    window.addEventListener('resize', calculateCellSize);
+
+    return () => {
+      window.removeEventListener('resize', calculateCellSize);
+    };
+  }, []);
 
   useEffect(() => {
     const newBoardState = Array(10)
@@ -119,19 +138,26 @@ const GameBoard: FC<GameBoardProps> = ({
     return { x, y };
   };
 
-  const handleCellClick = (x: number, y: number) => {
+  const handleChipClick = (clickedChip: Chip) => {
     if (!isRoundActive) return;
     if (
-      (activeChip?.type === 'attacker' && isAttackerDone) ||
-      (activeChip?.type === 'runner' && isRunnerDone)
+      (clickedChip.type === 'attacker' && isAttackerDone) ||
+      (clickedChip.type === 'runner' && isRunnerDone)
     )
       return;
 
+    setActiveChip(clickedChip);
+  };
+
+  const handleCellClick = (x: number, y: number) => {
+    if (!isRoundActive || !activeChip) return;
     if (
-      activeChip &&
-      isAdjacentCell(activeChip.coordinates, { x, y }) &&
-      !boardState[y][x]
-    ) {
+      (activeChip.type === 'attacker' && isAttackerDone) ||
+      (activeChip.type === 'runner' && isRunnerDone)
+    )
+      return;
+
+    if (isAdjacentCell(activeChip.coordinates, { x, y }) && !boardState[y][x]) {
       const updatedChip: Chip = { ...activeChip, coordinates: { x, y } };
       const newBoardState = boardState.map((row) => [...row]);
       newBoardState[activeChip.coordinates.y][activeChip.coordinates.x] = null;
@@ -154,18 +180,13 @@ const GameBoard: FC<GameBoardProps> = ({
       }
 
       setActiveChip(null);
-    } else {
-      const clickedChip = boardState[y][x];
-      if (
-        clickedChip &&
-        ((clickedChip.type === 'attacker' && !isAttackerDone) ||
-          (clickedChip.type === 'runner' && !isRunnerDone))
-      ) {
-        setActiveChip(clickedChip);
-      } else {
-        setActiveChip(null);
-      }
     }
+  };
+
+  const calculateChipPosition = (x: number, y: number) => {
+    return {
+      transform: `translate(${x * cellSize}px, ${y * cellSize}px)`,
+    };
   };
 
   return (
@@ -187,15 +208,14 @@ const GameBoard: FC<GameBoardProps> = ({
         <div className={styles.light} />
 
         <div className={styles.field}>
-          <div className={styles.grid}>
+          <div className={styles.grid} ref={gridRef}>
             {boardState.map((row, y) => (
               <div key={y} className={styles.row}>
-                {row.map((cell, x) => (
+                {row.map((_, x) => (
                   <GameCell
                     key={`${x}-${y}`}
                     x={x}
                     y={y}
-                    cell={cell}
                     attackers={
                       players.filter(
                         (player) =>
@@ -217,23 +237,30 @@ const GameBoard: FC<GameBoardProps> = ({
                         ? isAdjacentCell(activeChip.coordinates, { x, y })
                         : false
                     }
-                    onCellClick={handleCellClick}
-                  >
-                    {cell && (
-                      <GameChip
-                        variant={cell.type}
-                        isActive={activeChip?.id === cell.id}
-                        isDisabled={
-                          !isRoundActive ||
-                          (isRunnerDone && cell.type === 'runner') ||
-                          (isAttackerDone && cell.type === 'attacker')
-                        }
-                      />
-                    )}
-                  </GameCell>
+                    onCellClick={() => handleCellClick(x, y)}
+                  />
                 ))}
               </div>
             ))}
+
+            {cellSize > 0 &&
+              chips.map((chip) => (
+                <GameChip
+                  key={chip.id}
+                  variant={chip.type}
+                  isActive={activeChip?.id === chip.id}
+                  isDisabled={
+                    !isRoundActive ||
+                    (isRunnerDone && chip.type === 'runner') ||
+                    (isAttackerDone && chip.type === 'attacker')
+                  }
+                  style={calculateChipPosition(
+                    chip.coordinates.x,
+                    chip.coordinates.y
+                  )}
+                  onClick={() => handleChipClick(chip)}
+                />
+              ))}
           </div>
         </div>
       </div>

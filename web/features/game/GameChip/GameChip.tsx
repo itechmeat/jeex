@@ -7,12 +7,16 @@ interface GameChipProps {
   variant: ChipType;
   isActive: boolean;
   isDisabled: boolean;
+  style?: React.CSSProperties;
+  onClick: () => void;
 }
 
 const GameChip: React.FC<PropsWithChildren<GameChipProps>> = ({
   variant,
   isActive,
   isDisabled,
+  style,
+  onClick,
   children,
 }) => {
   return (
@@ -21,6 +25,8 @@ const GameChip: React.FC<PropsWithChildren<GameChipProps>> = ({
         [styles.active]: isActive,
         [styles.disabled]: isDisabled,
       })}
+      style={style}
+      onClick={onClick}
     >
       {children}
     </div>
