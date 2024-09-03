@@ -1,26 +1,16 @@
 import React from 'react';
-import { PlayerChips, Chip } from '../types';
+import { PlayerChips } from '../types';
 
 interface GameLeaderBoardProps {
   players: PlayerChips[];
-  realPlayer: {
-    attacker: Chip;
-    runner: Chip;
-  };
+  realPlayer: PlayerChips;
 }
 
 const GameLeaderBoard: React.FC<GameLeaderBoardProps> = ({
   players,
   realPlayer,
 }) => {
-  const allPlayers = [
-    {
-      player_id: 'You',
-      attacker_points: realPlayer.attacker.score,
-      runner_points: realPlayer.runner.score,
-    },
-    ...players,
-  ];
+  const allPlayers = [realPlayer, ...players];
 
   const sortedPlayers = allPlayers.sort(
     (a, b) =>
@@ -30,7 +20,7 @@ const GameLeaderBoard: React.FC<GameLeaderBoardProps> = ({
   );
 
   const playerRank =
-    sortedPlayers.findIndex((player) => player.player_id === 'You') + 1;
+    sortedPlayers.findIndex((player) => player === realPlayer) + 1;
   const totalPlayers = sortedPlayers.length;
 
   return (
@@ -53,10 +43,10 @@ const GameLeaderBoard: React.FC<GameLeaderBoardProps> = ({
           {sortedPlayers.map((player, index) => (
             <tr
               key={player.player_id}
-              style={player.player_id === 'You' ? { fontWeight: 'bold' } : {}}
+              style={player === realPlayer ? { fontWeight: 'bold' } : {}}
             >
               <td>{index + 1}</td>
-              <td>{player.player_id}</td>
+              <td>{player === realPlayer ? 'You' : player.player_id}</td>
               <td>{player.attacker_points.toFixed(2)}</td>
               <td>{player.runner_points.toFixed(2)}</td>
               <td>
