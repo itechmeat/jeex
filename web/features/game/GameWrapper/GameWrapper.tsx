@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 'use client';
 
-import React, { useReducer, useEffect, useCallback, FC } from 'react';
+import React, { useReducer, useEffect, useCallback, FC, useMemo } from 'react';
 import GameBoard from '@/features/game/GameBoard/GameBoard';
 import {
   ApiGame,
@@ -9,6 +9,7 @@ import {
   Coordinates,
   PlayerChips,
   ChipType,
+  LogEntry,
 } from '@/features/game/types';
 import {
   convertCoordToXY,
@@ -19,6 +20,7 @@ import {
 } from '../utils';
 import { useGameTimer } from '../hooks/useGameTimer';
 import GameLeaderBoard from '../GameLeaderBoard/GameLeaderBoard';
+import GameLog from '../GameLog/GameLog';
 
 const ROUND_DURATION = 10000;
 const ROUND_BREAK_DURATION = 2000;
@@ -32,12 +34,13 @@ interface GameState {
   isRunnerDone: boolean;
   currentRound: number;
   isGameActive: boolean;
+  logEntries: LogEntry[];
 }
 
 type GameAction =
   | { type: 'INIT_GAME' }
   | { type: 'MOVE_CHIP'; payload: { type: ChipType; coordinates: Coordinates } }
-  | { type: 'END_ROUND' }
+  | { type: 'END_ROUND'; payload?: LogEntry }
   | { type: 'END_GAME' };
 
 const gameReducer = (state: GameState, action: GameAction): GameState => {
@@ -63,6 +66,7 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         otherPlayers: generateGameInitialPlayers(GAMERS_COUNT - 1),
         currentRound: 0,
         isGameActive: true,
+        logEntries: [],
       };
     }
     case 'MOVE_CHIP':
@@ -79,9 +83,7 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
           action.payload.type === 'runner' ? true : state.isRunnerDone,
       };
     case 'END_ROUND': {
-      const updatedOtherPlayers = state.otherPlayers.map(
-        (player) => updatePlayerPositions([player])[0]
-      );
+      const updatedOtherPlayers = updatePlayerPositions(state.otherPlayers);
       const allPlayers = [
         ...updatedOtherPlayers,
         convertChipsToPlayerChips(state.playerChips),
@@ -95,13 +97,21 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
                 .attacker_points
             : recalculatedPlayers[recalculatedPlayers.length - 1].runner_points,
       }));
-      return {
+
+      const newState = {
         ...state,
         playerChips: updatedPlayerChips,
         otherPlayers: recalculatedPlayers.slice(0, -1),
         isAttackerDone: false,
         isRunnerDone: false,
         currentRound: state.currentRound + 1,
+      };
+
+      const newLogEntry = createLogEntry(newState);
+
+      return {
+        ...newState,
+        logEntries: [...state.logEntries, newLogEntry],
       };
     }
     case 'END_GAME':
@@ -112,6 +122,52 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
     default:
       return state;
   }
+};
+
+const createLogEntry = (state: GameState): LogEntry => {
+  const attackerChip = state.playerChips.find(
+    (chip) => chip.type === 'attacker'
+  )!;
+  const runnerChip = state.playerChips.find((chip) => chip.type === 'runner')!;
+  const attackerCell = convertXYToCoord(attackerChip.coordinates);
+  const runnerCell = convertXYToCoord(runnerChip.coordinates);
+
+  const attackersInAttackerCell = state.otherPlayers.filter(
+    (player) => player.attacker_coord === attackerCell
+  ).length;
+  const runnersInAttackerCell = state.otherPlayers.filter(
+    (player) => player.runner_coord === attackerCell
+  ).length;
+
+  const attackersInRunnerCell = state.otherPlayers.filter(
+    (player) => player.attacker_coord === runnerCell
+  ).length;
+  const runnersInRunnerCell = state.otherPlayers.filter(
+    (player) => player.runner_coord === runnerCell
+  ).length;
+
+  return {
+    round: state.currentRound,
+    attackerMove: {
+      coordinate: attackerCell,
+      runners: runnersInAttackerCell,
+      attackers: attackersInAttackerCell,
+      pointsGained: attackerChip.score,
+    },
+    runnerMove: {
+      coordinate: runnerCell,
+      runners: runnersInRunnerCell,
+      attackers: attackersInRunnerCell,
+      pointsLost: GAMERS_COUNT - runnerChip.score,
+    },
+    totalScore: attackerChip.score + runnerChip.score,
+    position:
+      state.otherPlayers.filter(
+        (player) =>
+          player.attacker_points + player.runner_points >
+          attackerChip.score + runnerChip.score
+      ).length + 1,
+  };
 };
 
 const generateRandomCoord = (): string => {
@@ -144,7 +200,16 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
     isRunnerDone: false,
     currentRound: 0,
     isGameActive: true,
+    logEntries: [],
   });
+
+  const handleEndRound = useCallback(() => {
+    dispatch({ type: 'END_ROUND' });
+  }, []);
+
+  const handleEndGame = useCallback(() => {
+    dispatch({ type: 'END_GAME' });
+  }, []);
 
   const { roundStartTime, roundEndTime, isRoundActive, timeLeft } =
     useGameTimer({
@@ -154,13 +219,13 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
           if (typeof action === 'function') {
             const newRound = action(state.currentRound);
             if (newRound >= TOTAL_ROUNDS) {
-              dispatch({ type: 'END_GAME' });
+              handleEndGame();
             } else {
-              dispatch({ type: 'END_ROUND' });
+              handleEndRound();
             }
           }
         },
-        [state.currentRound]
+        [state.currentRound, handleEndGame, handleEndRound]
       ),
       isGameActive: state.isGameActive,
       setIsGameActive: useCallback(
@@ -168,13 +233,13 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
           if (typeof action === 'function') {
             const shouldEndGame = !action(state.isGameActive);
             if (shouldEndGame) {
-              dispatch({ type: 'END_GAME' });
+              handleEndGame();
             }
           } else if (!action) {
-            dispatch({ type: 'END_GAME' });
+            handleEndGame();
           }
         },
-        [state.isGameActive]
+        [state.isGameActive, handleEndGame]
       ),
       setIsAttackerDone: useCallback(() => {
         /* No-op */
@@ -186,10 +251,6 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
       ROUND_BREAK_DURATION,
       TOTAL_ROUNDS,
     });
-
-  useEffect(() => {
-    dispatch({ type: 'INIT_GAME' });
-  }, []);
 
   const handleMoveMade = useCallback(
     (
@@ -208,32 +269,51 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
     []
   );
 
-  if (!state.isGameActive) {
-    const realPlayerChips = convertChipsToPlayerChips(state.playerChips);
-    return (
-      <GameLeaderBoard
-        players={state.otherPlayers}
-        realPlayer={realPlayerChips}
-      />
-    );
-  }
+  useEffect(() => {
+    dispatch({ type: 'INIT_GAME' });
+  }, []);
 
-  return (
-    <div>
-      <GameBoard
-        playerChips={state.playerChips}
-        otherPlayers={state.otherPlayers}
-        roundStartTime={roundStartTime}
-        roundEndTime={roundEndTime}
-        currentRound={state.currentRound}
-        isAttackerDone={state.isAttackerDone}
-        isRunnerDone={state.isRunnerDone}
-        onMoveMade={handleMoveMade}
-        isRoundActive={isRoundActive}
-        timeLeft={timeLeft}
-      />
-    </div>
-  );
+  const gameContent = useMemo(() => {
+    if (!state.isGameActive) {
+      const realPlayerChips = convertChipsToPlayerChips(state.playerChips);
+      return (
+        <>
+          <GameLeaderBoard
+            players={state.otherPlayers}
+            realPlayer={realPlayerChips}
+          />
+          <GameLog logEntries={state.logEntries} />
+        </>
+      );
+    }
+
+    return (
+      <div>
+        <GameBoard
+          playerChips={state.playerChips}
+          otherPlayers={state.otherPlayers}
+          roundStartTime={roundStartTime}
+          roundEndTime={roundEndTime}
+          currentRound={state.currentRound}
+          isAttackerDone={state.isAttackerDone}
+          isRunnerDone={state.isRunnerDone}
+          onMoveMade={handleMoveMade}
+          isRoundActive={isRoundActive}
+          timeLeft={timeLeft}
+        />
+        <GameLog logEntries={state.logEntries} />
+      </div>
+    );
+  }, [
+    state,
+    roundStartTime,
+    roundEndTime,
+    isRoundActive,
+    timeLeft,
+    handleMoveMade,
+  ]);
+
+  return gameContent;
 };
 
 export default GameWrapper;

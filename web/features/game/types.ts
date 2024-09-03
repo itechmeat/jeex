@@ -31,3 +31,21 @@ export interface PlayerChipsSet {
   attacker: Chip | null;
   runner: Chip | null;
 }
+
+export interface LogEntry {
+  round: number;
+  attackerMove: {
+    coordinate: string;
+    runners: number;
+    attackers: number;
+    pointsGained: number;
+  };
+  runnerMove: {
+    coordinate: string;
+    runners: number;
+    attackers: number;
+    pointsLost: number;
+  };
+  totalScore: number;
+  position: number;
+}
