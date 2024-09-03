@@ -1,0 +1,53 @@
+.log {
+  position: relative;
+}
+
+.entries {
+  width: 100%;
+
+  td,
+  th {
+    padding: 2px;
+    border: 1px solid #ccc;
+  }
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.attacker,
+.runner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 12px;
+}
+
+.attacker {
+  background-color: #6e1fce;
+}
+
+.runner {
+  background-color: #19fb9b;
+  color: #000;
+}
+
+.points {
+  font-size: 14px;
+  font-weight: bold;
+
+  // &.positive {
+  //   color: #19fb9b;
+  // }
+
+  // &.negative {
+  //   color: #671ec0;
+  // }
+}

@@ -22,7 +22,7 @@ import { useGameTimer } from '../hooks/useGameTimer';
 import GameLeaderBoard from '../GameLeaderBoard/GameLeaderBoard';
 import GameLog from '../GameLog/GameLog';
 
-const ROUND_DURATION = 10000;
+const ROUND_DURATION = 3000;
 const ROUND_BREAK_DURATION = 2000;
 const TOTAL_ROUNDS = 10;
 const GAMERS_COUNT = 100;
@@ -282,7 +282,11 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
             players={state.otherPlayers}
             realPlayer={realPlayerChips}
           />
-          <GameLog logEntries={state.logEntries} />
+          <GameLog
+            logEntries={state.logEntries}
+            playersCount={GAMERS_COUNT}
+            isFinished
+          />
         </>
       );
     }
@@ -301,7 +305,11 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
           isRoundActive={isRoundActive}
           timeLeft={timeLeft}
         />
-        <GameLog logEntries={state.logEntries} />
+        <GameLog
+          logEntries={state.logEntries}
+          currentRound={state.currentRound}
+          playersCount={GAMERS_COUNT}
+        />
       </div>
     );
   }, [
