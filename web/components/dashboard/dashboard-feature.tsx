@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import Link from 'next/link';
@@ -7,7 +8,11 @@ export default function DashboardFeature() {
   return (
     <div>
       <AppHero
-        title="FranzyTag"
+        title={
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <img src="/images/logo.png" width="300" alt="Jeex" />
+          </div>
+        }
         subtitle="Every square a battlefield, every move a strategy!"
       />
 
@@ -20,7 +25,7 @@ export default function DashboardFeature() {
           </p>
 
           <div className="py-6">
-            <Link href="/games/demo" className="btn btn-primary rounded-btn">
+            <Link href="/games/demo" className="btn rounded-btn btnPrimary">
               Start the Game
             </Link>
           </div>

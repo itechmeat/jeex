@@ -81,6 +81,8 @@ const GameLog: React.FC<GameLogProps> = ({ logEntries, playersCount }) => {
     );
   };
 
+  if (!logEntries.length) return null;
+
   return (
     <div className={styles.log}>
       <h3 className={styles.title}>Game Log</h3>

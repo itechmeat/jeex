@@ -1,6 +1,10 @@
 import GameWrapper from '@/features/game/GameWrapper/GameWrapper';
 import { ApiGame } from '@/features/game/types';
 
+export const metadata = {
+  title: 'New game on JEEX',
+};
+
 export default async function GamePage({ params }: { params: { id: string } }) {
   const game = {
     id: params.id,

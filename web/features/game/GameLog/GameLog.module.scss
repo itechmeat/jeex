@@ -1,5 +1,6 @@
 .log {
   position: relative;
+  margin: 24px auto;
 }
 
 .entries {
@@ -9,6 +10,10 @@
   th {
     padding: 2px;
     border: 1px solid #ccc;
+  }
+
+  th {
+    font-size: 12px;
   }
 }
 

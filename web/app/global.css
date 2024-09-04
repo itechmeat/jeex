@@ -9,12 +9,41 @@ body {
 }
 
 .wallet-adapter-button-trigger {
-  background: rgb(100, 26, 230) !important;
-  border-radius: 8px !important;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
+  height: 32px !important;
+  border-radius: 32px !important;
+  padding: 2px 12px !important;
+  background-image: linear-gradient(
+    to right,
+    rgb(20, 241, 149),
+    rgb(128, 236, 255),
+    rgb(100, 168, 242)
+  ) !important;
+  color: #000 !important;
+  font-weight: normal !important;
 }
 .wallet-adapter-dropdown-list,
 .wallet-adapter-button {
   font-family: inherit !important;
+}
+
+.btnPrimary {
+  border-radius: 32px;
+  background-image: linear-gradient(
+    90deg,
+    rgb(199, 102, 239),
+    rgb(121, 40, 210) 51.04%,
+    rgb(43, 12, 82)
+  );
+  color: #fff;
+  font-weight: normal;
+  text-transform: uppercase;
+}
+
+.btnPrimary:hover {
+  background-image: linear-gradient(
+    90deg,
+    rgb(43, 12, 82),
+    rgb(121, 40, 210) 51.04%,
+    rgb(199, 102, 239)
+  );
 }
