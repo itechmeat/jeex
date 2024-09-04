@@ -19,11 +19,6 @@ const GameLog: React.FC<GameLogProps> = ({ logEntries, playersCount }) => {
     index: number;
   }) => {
     const previousPositions = logEntries[index - 1]?.position ?? 0;
-    console.log(
-      // '🚀 ~ currentPosition/previousPositions:',
-      currentPosition,
-      previousPositions
-    );
 
     if (index === 0) {
       return (
