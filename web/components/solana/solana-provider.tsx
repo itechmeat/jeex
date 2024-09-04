@@ -11,7 +11,8 @@ import {
   WalletProvider,
 } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-import { ReactNode, useCallback, useMemo } from 'react';
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { CanvasInterface, CanvasClient } from '@dscvr-one/canvas-client-sdk';
 import { useCluster } from '../cluster/cluster-data-access';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
@@ -28,6 +29,21 @@ export function SolanaProvider({ children }: { children: ReactNode }) {
   const onError = useCallback((error: WalletError) => {
     console.error(error);
   }, []);
+
+  const [canvasResponse, setCanvasResponse] = useState<any | null>(null);
+  console.log('🚀 ~ SolanaProvider ~ canvasResponse:', canvasResponse);
+
+  const getCanvasResponse = useCallback(async () => {
+    if (typeof window !== 'undefined') {
+      const canvasClient = new CanvasClient();
+      const response = await canvasClient.ready();
+      setCanvasResponse(response);
+    }
+  }, []);
+
+  useEffect(() => {
+    getCanvasResponse();
+  }, [getCanvasResponse]);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
