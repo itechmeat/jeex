@@ -31,7 +31,7 @@ export function SolanaProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const [canvasResponse, setCanvasResponse] = useState<any | null>(null);
-  console.log('🚀 ~ SolanaProvider ~ canvasResponse:', canvasResponse);
+  // console.log('🚀 ~ SolanaProvider ~ canvasResponse:', canvasResponse);
 
   const getCanvasResponse = useCallback(async () => {
     if (typeof window !== 'undefined') {

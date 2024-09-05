@@ -10,6 +10,9 @@ interface GameCellProps {
   runners: number;
   isRoundActive: boolean;
   isAdjacentCell: boolean;
+  isSetupPhase: boolean;
+  isHighlighted: boolean;
+  highlightColor: 'runner' | 'attacker';
   onCellClick: (x: number, y: number) => void;
 }
 
@@ -21,6 +24,9 @@ const GameCell: FC<GameCellProps> = ({
   runners,
   isRoundActive,
   isAdjacentCell,
+  isSetupPhase,
+  isHighlighted,
+  highlightColor,
   onCellClick,
 }) => {
   const getRandomPercentage = () => `calc(${10 + Math.random() * 70}% - 4px)`;
@@ -31,7 +37,7 @@ const GameCell: FC<GameCellProps> = ({
         activeChip && isAdjacentCell && isRoundActive
           ? styles[`highlight-${activeChip.type}`]
           : ''
-      }`}
+      } ${isHighlighted ? styles[`highlight-${highlightColor}`] : ''}`}
       onClick={() => {
         onCellClick(x, y);
       }}

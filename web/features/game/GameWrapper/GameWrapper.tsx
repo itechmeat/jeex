@@ -34,6 +34,9 @@ interface GameState {
   isRunnerDone: boolean;
   currentRound: number;
   isGameActive: boolean;
+  isSetupPhase: boolean;
+  isRunnerPlaced: boolean;
+  isPlayerEliminated: boolean;
   logEntries: LogEntry[];
 }
 
@@ -41,34 +44,59 @@ type GameAction =
   | { type: 'INIT_GAME' }
   | { type: 'MOVE_CHIP'; payload: { type: ChipType; coordinates: Coordinates } }
   | { type: 'END_ROUND'; payload?: LogEntry }
-  | { type: 'END_GAME' };
+  | { type: 'END_GAME' }
+  | { type: 'PLACE_RUNNER'; payload: Coordinates }
+  | { type: 'PLACE_ATTACKER'; payload: Coordinates }
+  | { type: 'END_SETUP_PHASE' }
+  | { type: 'ELIMINATE_PLAYER' };
 
 const gameReducer = (state: GameState, action: GameAction): GameState => {
   switch (action.type) {
-    case 'INIT_GAME': {
-      const initialPlayerChips = [
-        {
-          id: 'player-attacker',
-          type: 'attacker' as ChipType,
-          coordinates: convertCoordToXY(generateRandomCoord()),
-          score: 0,
-        },
-        {
-          id: 'player-runner',
-          type: 'runner' as ChipType,
-          coordinates: convertCoordToXY(generateRandomCoord()),
-          score: GAMERS_COUNT,
-        },
-      ];
+    case 'INIT_GAME':
       return {
         ...state,
-        playerChips: initialPlayerChips,
+        playerChips: [],
         otherPlayers: generateGameInitialPlayers(GAMERS_COUNT - 1),
         currentRound: 0,
         isGameActive: true,
         logEntries: [],
+        isSetupPhase: true,
+        isRunnerPlaced: false,
       };
-    }
+    case 'PLACE_RUNNER':
+      return {
+        ...state,
+        playerChips: [
+          ...state.playerChips,
+          {
+            id: 'player-runner',
+            type: 'runner' as ChipType,
+            coordinates: action.payload,
+            score: GAMERS_COUNT,
+          },
+        ],
+        isRunnerPlaced: true,
+      };
+    case 'PLACE_ATTACKER':
+      return {
+        ...state,
+        playerChips: [
+          ...state.playerChips,
+          {
+            id: 'player-attacker',
+            type: 'attacker' as ChipType,
+            coordinates: action.payload,
+            score: 0,
+          },
+        ],
+      };
+    case 'END_SETUP_PHASE':
+      return {
+        ...state,
+        isSetupPhase: false,
+        isAttackerDone: true,
+        isRunnerDone: true,
+      };
     case 'MOVE_CHIP':
       return {
         ...state,
@@ -105,15 +133,25 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         isAttackerDone: false,
         isRunnerDone: false,
         currentRound: state.currentRound + 1,
+        isSetupPhase: false,
+        isPlayerEliminated: !state.isAttackerDone || !state.isRunnerDone,
       };
 
-      const newLogEntry = createLogEntry(newState);
+      const newLogEntries = state.isPlayerEliminated
+        ? state.logEntries
+        : [...state.logEntries, createLogEntry(newState)];
 
       return {
         ...newState,
-        logEntries: [...state.logEntries, newLogEntry],
+        logEntries: newLogEntries,
       };
     }
+    case 'ELIMINATE_PLAYER':
+      return {
+        ...state,
+        playerChips: [],
+        isPlayerEliminated: true,
+      };
     case 'END_GAME':
       return {
         ...state,
@@ -127,8 +165,29 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
 const createLogEntry = (state: GameState): LogEntry => {
   const attackerChip = state.playerChips.find(
     (chip) => chip.type === 'attacker'
-  )!;
-  const runnerChip = state.playerChips.find((chip) => chip.type === 'runner')!;
+  );
+  const runnerChip = state.playerChips.find((chip) => chip.type === 'runner');
+
+  if (!attackerChip || !runnerChip) {
+    return {
+      round: state.currentRound,
+      attackerMove: {
+        coordinate: 'A1',
+        runners: 0,
+        attackers: 0,
+        pointsGained: 0,
+      },
+      runnerMove: {
+        coordinate: 'A1',
+        runners: 0,
+        attackers: 0,
+        pointsLost: 0,
+      },
+      totalScore: 0,
+      position: state.otherPlayers.length + 1,
+    };
+  }
+
   const attackerCell = convertXYToCoord(attackerChip.coordinates);
   const runnerCell = convertXYToCoord(runnerChip.coordinates);
 
@@ -177,14 +236,25 @@ const generateRandomCoord = (): string => {
 };
 
 const convertChipsToPlayerChips = (chips: Chip[]): PlayerChips => {
-  const attacker = chips.find((chip) => chip.type === 'attacker')!;
-  const runner = chips.find((chip) => chip.type === 'runner')!;
+  if (chips.length === 0) {
+    return {
+      player_id: 0,
+      attacker_coord: 'A1',
+      attacker_points: 0,
+      runner_coord: 'A1',
+      runner_points: 0,
+    };
+  }
+
+  const attacker = chips.find((chip) => chip.type === 'attacker');
+  const runner = chips.find((chip) => chip.type === 'runner');
+
   return {
     player_id: 0,
-    attacker_coord: convertXYToCoord(attacker.coordinates),
-    attacker_points: attacker.score,
-    runner_coord: convertXYToCoord(runner.coordinates),
-    runner_points: runner.score,
+    attacker_coord: attacker ? convertXYToCoord(attacker.coordinates) : 'A1',
+    attacker_points: attacker ? attacker.score : 0,
+    runner_coord: runner ? convertXYToCoord(runner.coordinates) : 'A1',
+    runner_points: runner ? runner.score : 0,
   };
 };
 
@@ -201,6 +271,9 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
     currentRound: 0,
     isGameActive: true,
     logEntries: [],
+    isSetupPhase: true,
+    isRunnerPlaced: false,
+    isPlayerEliminated: false,
   });
 
   const handleEndRound = useCallback(() => {
@@ -252,12 +325,45 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
       TOTAL_ROUNDS,
     });
 
+  const handlePlaceChip = useCallback(
+    (coordinates: Coordinates) => {
+      if (!state.isRunnerPlaced) {
+        dispatch({ type: 'PLACE_RUNNER', payload: coordinates });
+      } else if (state.playerChips.length === 1) {
+        dispatch({ type: 'PLACE_ATTACKER', payload: coordinates });
+        dispatch({ type: 'END_SETUP_PHASE' });
+      }
+    },
+    [state.isRunnerPlaced, state.playerChips.length]
+  );
+
+  const handleEndSetupPhase = useCallback(() => {
+    if (state.playerChips.length !== 2) {
+      dispatch({ type: 'ELIMINATE_PLAYER' });
+    } else {
+      dispatch({ type: 'END_SETUP_PHASE' });
+    }
+  }, [state.playerChips.length]);
+
+  useEffect(() => {
+    if (state.isSetupPhase && state.currentRound === 0) {
+      const timer = setTimeout(() => {
+        handleEndSetupPhase();
+      }, ROUND_DURATION);
+
+      return () => clearTimeout(timer);
+    }
+  }, [state.isSetupPhase, state.currentRound, handleEndSetupPhase]);
+
   const handleMoveMade = useCallback(
     (
       attackerCoords: Coordinates,
       runnerCoords: Coordinates,
       moving: Chip['type']
     ) => {
+      if (state.isPlayerEliminated || state.isSetupPhase) {
+        return;
+      }
       dispatch({
         type: 'MOVE_CHIP',
         payload: {
@@ -266,7 +372,7 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
         },
       });
     },
-    []
+    [state.isPlayerEliminated, state.isSetupPhase]
   );
 
   useEffect(() => {
@@ -281,6 +387,7 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
           <GameLeaderBoard
             players={state.otherPlayers}
             realPlayer={realPlayerChips}
+            isPlayerEliminated={state.isPlayerEliminated}
           />
           <GameLog
             logEntries={state.logEntries}
@@ -304,6 +411,10 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
           onMoveMade={handleMoveMade}
           isRoundActive={isRoundActive}
           timeLeft={timeLeft}
+          isSetupPhase={state.isSetupPhase}
+          isRunnerPlaced={state.isRunnerPlaced}
+          onPlaceChip={handlePlaceChip}
+          isPlayerEliminated={state.isPlayerEliminated}
         />
         <GameLog
           logEntries={state.logEntries}
@@ -319,6 +430,7 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
     isRoundActive,
     timeLeft,
     handleMoveMade,
+    handlePlaceChip,
   ]);
 
   return gameContent;
