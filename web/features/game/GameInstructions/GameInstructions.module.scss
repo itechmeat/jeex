@@ -1,0 +1,22 @@
+.status {
+  color: #64a9f2;
+}
+
+.text {
+  .runner & {
+    color: #19fb9b;
+  }
+
+  .attacker & {
+    color: #9945ff;
+  }
+
+  .attackerDone &,
+  .runnerDone & {
+    text-decoration: line-through;
+  }
+}
+
+.done {
+  font-weight: bold;
+}

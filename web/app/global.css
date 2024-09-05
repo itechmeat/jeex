@@ -8,6 +8,10 @@ body {
   background: #1b1622;
 }
 
+.main {
+  background: #1b1622;
+}
+
 .wallet-adapter-button-trigger {
   height: 32px !important;
   border-radius: 32px !important;
@@ -46,4 +50,8 @@ body {
     rgb(121, 40, 210) 51.04%,
     rgb(199, 102, 239)
   );
+}
+
+.link {
+  color: #64a9f2;
 }

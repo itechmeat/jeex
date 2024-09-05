@@ -7,7 +7,8 @@ import GameChip from '../GameChip/GameChip';
 import GameStat from '../GameStat/GameStat';
 import { isAdjacentCell, convertXYToCoord } from '../utils';
 import Eliminated from '@/components/Eliminated/Eliminated';
-import TimerProgress from '@/components/TimerProgress/TimerProgress';
+import GameProgress from '@/features/game/GameProgress/GameProgress';
+import GameInstructions from '../GameInstructions/GameInstructions';
 
 interface GameBoardProps {
   playerChips: Chip[];
@@ -129,7 +130,7 @@ const GameBoard: FC<GameBoardProps> = ({
         </div>
       </div>
 
-      <TimerProgress
+      <GameProgress
         currentRound={currentRound}
         isSetupPhase={isSetupPhase}
         isRoundActive={isRoundActive}
@@ -220,6 +221,14 @@ const GameBoard: FC<GameBoardProps> = ({
           </div>
         </div>
       </div>
+
+      <GameInstructions
+        isSetupPhase={isSetupPhase}
+        isRoundActive={isRoundActive}
+        isAttackerDone={isAttackerDone}
+        isRunnerDone={isRunnerDone}
+        isPlayerEliminated={isPlayerEliminated}
+      />
     </div>
   );
 };

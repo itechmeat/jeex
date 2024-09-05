@@ -34,6 +34,7 @@ export function UiLayout({
             <img src="/images/logo.png" width="60" alt="Jeex" />
           </Link>
         </div>
+
         <div className="flex-none space-x-2">
           <WalletButton />
           {process.env.NODE_ENV === 'development' && <ClusterUiSelect />}
@@ -68,7 +69,8 @@ export function UiLayout({
       <ClusterChecker>
         <AccountChecker />
       </ClusterChecker>
-      <div className="flex-grow mx-4 lg:mx-auto">
+
+      <div className="flex-grow px-4 lg:mx-auto main">
         <Suspense
           fallback={
             <div className="text-center my-32">

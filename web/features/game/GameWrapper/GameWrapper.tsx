@@ -76,6 +76,7 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
           },
         ],
         isRunnerPlaced: true,
+        isRunnerDone: true,
       };
     case 'PLACE_ATTACKER':
       return {
@@ -89,6 +90,7 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
             score: 0,
           },
         ],
+        isAttackerDone: true,
       };
     case 'END_SETUP_PHASE':
       return {

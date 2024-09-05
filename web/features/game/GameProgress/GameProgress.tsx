@@ -1,18 +1,18 @@
 import { FC, useMemo } from 'react';
-import styles from './TimerProgress.module.scss';
+import styles from './GameProgress.module.scss';
 import {
   ROUND_BREAK_DURATION,
   ROUND_DURATION,
 } from '@/features/game/constants';
 
-interface TimerProgressProps {
+interface GameProgressProps {
   currentRound: number;
   isSetupPhase: boolean;
   isRoundActive: boolean;
   timeLeft: number;
 }
 
-const TimerProgress: FC<TimerProgressProps> = ({
+const GameProgress: FC<GameProgressProps> = ({
   currentRound,
   isSetupPhase,
   isRoundActive,
@@ -53,4 +53,4 @@ const TimerProgress: FC<TimerProgressProps> = ({
   );
 };
 
-export default TimerProgress;
+export default GameProgress;
