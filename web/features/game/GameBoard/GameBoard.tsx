@@ -6,6 +6,8 @@ import GameCell from '../GameCell/GameCell';
 import GameChip from '../GameChip/GameChip';
 import GameStat from '../GameStat/GameStat';
 import { isAdjacentCell, convertXYToCoord } from '../utils';
+import Eliminated from '@/components/Eliminated/Eliminated';
+import TimerProgress from '@/components/TimerProgress/TimerProgress';
 
 interface GameBoardProps {
   playerChips: Chip[];
@@ -125,20 +127,20 @@ const GameBoard: FC<GameBoardProps> = ({
         <div className={styles.round}>
           {isSetupPhase ? 'Setup Phase' : `Round ${currentRound + 1}`}
         </div>
-        <div className={styles.timer}>
-          {isPlayerEliminated
-            ? 'You are eliminated'
-            : isSetupPhase
-            ? `${timeLeft} seconds to place your chips`
-            : timeLeft > 0
-            ? `${timeLeft} seconds until the ${
-                isRoundActive ? 'end' : 'start'
-              } of the round`
-            : 'Round is finished'}
-        </div>
       </div>
 
-      {!isPlayerEliminated && <GameStat playerChips={playerChipsSet} />}
+      <TimerProgress
+        currentRound={currentRound}
+        isSetupPhase={isSetupPhase}
+        isRoundActive={isRoundActive}
+        timeLeft={timeLeft}
+      />
+
+      {isPlayerEliminated ? (
+        <Eliminated subtext="You didn't make your move, so you were eliminated from the game." />
+      ) : (
+        <GameStat playerChips={playerChipsSet} />
+      )}
 
       <div className={styles.area}>
         <div className={styles.light} />

@@ -1,5 +1,6 @@
 import React from 'react';
 import { PlayerChips } from '../types';
+import Eliminated from '@/components/Eliminated/Eliminated';
 import styles from './GameLeaderBoard.module.scss';
 
 interface GameLeaderBoardProps {
@@ -27,15 +28,19 @@ const GameLeaderBoard: React.FC<GameLeaderBoardProps> = ({
   const totalPlayers = sortedPlayers.length;
 
   return (
-    <div>
-      <h2>Game Over - LeaderBoard</h2>
+    <div className={styles.leaderBoard}>
+      <h1 className={styles.title}>Game Over</h1>
+
       {isPlayerEliminated ? (
-        <p>You are eliminated</p>
+        <Eliminated />
       ) : (
         <p>
           Your final position: {playerRank} out of {totalPlayers}
         </p>
       )}
+
+      <h2 className={styles.subtitle}>Leader Board</h2>
+
       <table className={styles.leaders}>
         <thead>
           <tr>

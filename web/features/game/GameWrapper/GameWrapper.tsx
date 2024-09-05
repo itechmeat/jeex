@@ -20,11 +20,12 @@ import {
 import { useGameTimer } from '../hooks/useGameTimer';
 import GameLeaderBoard from '../GameLeaderBoard/GameLeaderBoard';
 import GameLog from '../GameLog/GameLog';
-
-const ROUND_DURATION = 10000;
-const ROUND_BREAK_DURATION = 2000;
-const TOTAL_ROUNDS = 10;
-const GAMERS_COUNT = 100;
+import {
+  GAMERS_COUNT,
+  ROUND_BREAK_DURATION,
+  ROUND_DURATION,
+  TOTAL_ROUNDS,
+} from '../constants';
 
 interface GameState {
   playerChips: Chip[];

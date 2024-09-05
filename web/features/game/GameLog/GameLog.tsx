@@ -85,7 +85,7 @@ const GameLog: React.FC<GameLogProps> = ({ logEntries, playersCount }) => {
 
   return (
     <div className={styles.log}>
-      <h3 className={styles.title}>Game Log</h3>
+      <h2 className={styles.title}>Game Log</h2>
       <table className={styles.entries}>
         <thead>
           <tr>
