@@ -63,12 +63,12 @@
   }
 
   @media screen and (max-width: 500px) {
-    --cell-shadow-size: 2px;
+    --cell-shadow-size: 3px;
     --cell-blur: 3px;
   }
 
   @media screen and (max-width: 400px) {
-    --cell-shadow-size: 1px;
+    --cell-shadow-size: 3px;
     --cell-blur: 2px;
   }
 }
