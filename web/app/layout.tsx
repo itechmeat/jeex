@@ -1,3 +1,4 @@
+import './fonts.css';
 import './global.css';
 import { UiLayout } from '@/components/ui/ui-layout';
 import { ClusterProvider } from '@/components/cluster/cluster-data-access';

@@ -6,6 +6,9 @@ import GameCell from '../GameCell/GameCell';
 import GameChip from '../GameChip/GameChip';
 import GameStat from '../GameStat/GameStat';
 import { isAdjacentCell, convertXYToCoord } from '../utils';
+import Eliminated from '@/components/Eliminated/Eliminated';
+import GameProgress from '@/features/game/GameProgress/GameProgress';
+import GameInstructions from '../GameInstructions/GameInstructions';
 
 interface GameBoardProps {
   playerChips: Chip[];
@@ -15,13 +18,17 @@ interface GameBoardProps {
   currentRound: number;
   isAttackerDone: boolean;
   isRunnerDone: boolean;
+  isRoundActive: boolean;
+  timeLeft: number;
+  isSetupPhase: boolean;
+  isRunnerPlaced: boolean;
+  isPlayerEliminated: boolean;
+  onPlaceChip: (coordinates: Coordinates) => void;
   onMoveMade: (
     attackerCoords: Coordinates,
     runnerCoords: Coordinates,
     moving: Chip['type']
   ) => void;
-  isRoundActive: boolean;
-  timeLeft: number;
 }
 
 const GameBoard: FC<GameBoardProps> = ({
@@ -32,9 +39,13 @@ const GameBoard: FC<GameBoardProps> = ({
   currentRound,
   isAttackerDone,
   isRunnerDone,
-  onMoveMade,
   isRoundActive,
   timeLeft,
+  isSetupPhase,
+  isRunnerPlaced,
+  isPlayerEliminated,
+  onPlaceChip,
+  onMoveMade,
 }) => {
   const [activeChip, setActiveChip] = useState<Chip | null>(null);
   const [cellSize, setCellSize] = useState(0);
@@ -66,7 +77,7 @@ const GameBoard: FC<GameBoardProps> = ({
   }, []);
 
   const handleChipClick = (clickedChip: Chip) => {
-    if (!isRoundActive) return;
+    if (!isRoundActive || isPlayerEliminated) return;
     if (
       (clickedChip.type === 'attacker' && isAttackerDone) ||
       (clickedChip.type === 'runner' && isRunnerDone)
@@ -77,6 +88,12 @@ const GameBoard: FC<GameBoardProps> = ({
   };
 
   const handleCellClick = (x: number, y: number) => {
+    if (isPlayerEliminated) return;
+    if (isSetupPhase) {
+      onPlaceChip({ x, y });
+      return;
+    }
+
     if (!isRoundActive || !activeChip) return;
     if (
       (activeChip.type === 'attacker' && isAttackerDone) ||
@@ -108,17 +125,23 @@ const GameBoard: FC<GameBoardProps> = ({
   return (
     <div className={styles.gameBoard}>
       <div className={styles.info}>
-        <div className={styles.round}>Round {currentRound + 1}</div>
-        <div className={styles.timer}>
-          {timeLeft > 0
-            ? `${timeLeft} seconds until the ${
-                isRoundActive ? 'end' : 'start'
-              } of the round`
-            : 'Round is finished'}
+        <div className={styles.round}>
+          {isSetupPhase ? 'Setup Phase' : `Round ${currentRound + 1}`}
         </div>
       </div>
 
-      <GameStat playerChips={playerChipsSet} />
+      <GameProgress
+        currentRound={currentRound}
+        isSetupPhase={isSetupPhase}
+        isRoundActive={isRoundActive}
+        timeLeft={timeLeft}
+      />
+
+      {isPlayerEliminated ? (
+        <Eliminated subtext="You didn't make your move, so you were eliminated from the game." />
+      ) : (
+        <GameStat playerChips={playerChipsSet} />
+      )}
 
       <div className={styles.area}>
         <div className={styles.light} />
@@ -156,6 +179,18 @@ const GameBoard: FC<GameBoardProps> = ({
                             ? isAdjacentCell(activeChip.coordinates, { x, y })
                             : false
                         }
+                        isSetupPhase={isSetupPhase}
+                        isHighlighted={
+                          isSetupPhase &&
+                          !isPlayerEliminated &&
+                          (!isRunnerPlaced ||
+                            !playerChips.some(
+                              (chip) =>
+                                chip.coordinates.x === x &&
+                                chip.coordinates.y === y
+                            ))
+                        }
+                        highlightColor={isRunnerPlaced ? 'attacker' : 'runner'}
                         onCellClick={() => handleCellClick(x, y)}
                       />
                     ))}
@@ -163,12 +198,15 @@ const GameBoard: FC<GameBoardProps> = ({
               ))}
 
             {cellSize > 0 &&
+              !isPlayerEliminated &&
               playerChips.map((chip) => (
                 <GameChip
                   key={chip.id}
                   variant={chip.type}
                   isActive={activeChip?.id === chip.id}
                   isDisabled={
+                    isPlayerEliminated ||
+                    isSetupPhase ||
                     !isRoundActive ||
                     (chip.type === 'runner' && isRunnerDone) ||
                     (chip.type === 'attacker' && isAttackerDone)
@@ -183,6 +221,14 @@ const GameBoard: FC<GameBoardProps> = ({
           </div>
         </div>
       </div>
+
+      <GameInstructions
+        isSetupPhase={isSetupPhase}
+        isRoundActive={isRoundActive}
+        isAttackerDone={isAttackerDone}
+        isRunnerDone={isRunnerDone}
+        isPlayerEliminated={isPlayerEliminated}
+      />
     </div>
   );
 };

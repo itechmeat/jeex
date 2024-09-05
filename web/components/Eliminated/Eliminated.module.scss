@@ -1,0 +1,23 @@
+.container {
+  text-align: center;
+}
+
+.text {
+  color: transparent;
+  background-clip: text;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: transparent;
+  line-height: 1;
+  font-family: 'Kallisto', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 32px;
+  background-image: linear-gradient(180deg, #f087ff 0%, #6e1fce 100%);
+}
+
+.subtext {
+  margin: 8px 0 0;
+  color: #64a9f2;
+  font-size: 14px;
+}

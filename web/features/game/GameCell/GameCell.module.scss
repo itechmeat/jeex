@@ -3,6 +3,8 @@
   --cell-max-size: 48px;
   --cell-corner: 12%;
   --cell-corner-anti: calc(100% - var(--cell-corner));
+  --cell-shadow-size: 4px;
+  --cell-blur: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -44,32 +46,30 @@
     left: 0;
     width: 100%;
     height: 100%;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(var(--cell-blur));
     border-radius: 20%;
   }
 
   &.highlight-runner {
     &::before {
-      box-shadow: inset 0 0 4px #14f195;
+      box-shadow: inset 0 0 var(--cell-shadow-size) #14f195;
     }
   }
 
   &.highlight-attacker {
     &::before {
-      box-shadow: inset 0 0 4px #9945ff;
+      box-shadow: inset 0 0 var(--cell-shadow-size) #9945ff;
     }
   }
 
   @media screen and (max-width: 500px) {
-    &::after {
-      backdrop-filter: blur(3px);
-    }
+    --cell-shadow-size: 3px;
+    --cell-blur: 3px;
   }
 
   @media screen and (max-width: 400px) {
-    &::after {
-      backdrop-filter: blur(2px);
-    }
+    --cell-shadow-size: 3px;
+    --cell-blur: 2px;
   }
 }
 

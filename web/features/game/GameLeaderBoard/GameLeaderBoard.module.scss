@@ -1,3 +1,26 @@
+.leaderBoard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.title,
+.subtitle {
+  margin: 0;
+  color: #fff;
+  font-family: 'Kallisto', sans-serif;
+  font-style: bold;
+  text-align: center;
+}
+
+.title {
+  font-size: 32px;
+}
+
+.subtitle {
+  font-size: 18px;
+}
+
 .leaders {
   width: 100%;
 

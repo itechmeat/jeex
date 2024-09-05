@@ -30,20 +30,20 @@ export function SolanaProvider({ children }: { children: ReactNode }) {
     console.error(error);
   }, []);
 
-  const [canvasResponse, setCanvasResponse] = useState<any | null>(null);
-  console.log('🚀 ~ SolanaProvider ~ canvasResponse:', canvasResponse);
+  // const [canvasResponse, setCanvasResponse] = useState<any | null>(null);
+  // // console.log('🚀 ~ SolanaProvider ~ canvasResponse:', canvasResponse);
 
-  const getCanvasResponse = useCallback(async () => {
-    if (typeof window !== 'undefined') {
-      const canvasClient = new CanvasClient();
-      const response = await canvasClient.ready();
-      setCanvasResponse(response);
-    }
-  }, []);
+  // const getCanvasResponse = useCallback(async () => {
+  //   if (typeof window !== 'undefined') {
+  //     const canvasClient = new CanvasClient();
+  //     const response = await canvasClient.ready();
+  //     setCanvasResponse(response);
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    getCanvasResponse();
-  }, [getCanvasResponse]);
+  // useEffect(() => {
+  //   getCanvasResponse();
+  // }, [getCanvasResponse]);
 
   return (
     <ConnectionProvider endpoint={endpoint}>

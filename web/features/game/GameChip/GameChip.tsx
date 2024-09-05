@@ -16,8 +16,8 @@ const GameChip: React.FC<PropsWithChildren<GameChipProps>> = ({
   isActive,
   isDisabled,
   style,
-  onClick,
   children,
+  onClick,
 }) => {
   return (
     <div
