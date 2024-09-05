@@ -15,17 +15,17 @@ interface GameBoardProps {
   currentRound: number;
   isAttackerDone: boolean;
   isRunnerDone: boolean;
-  onMoveMade: (
-    attackerCoords: Coordinates,
-    runnerCoords: Coordinates,
-    moving: Chip['type']
-  ) => void;
   isRoundActive: boolean;
   timeLeft: number;
   isSetupPhase: boolean;
   isRunnerPlaced: boolean;
   isPlayerEliminated: boolean;
   onPlaceChip: (coordinates: Coordinates) => void;
+  onMoveMade: (
+    attackerCoords: Coordinates,
+    runnerCoords: Coordinates,
+    moving: Chip['type']
+  ) => void;
 }
 
 const GameBoard: FC<GameBoardProps> = ({
@@ -36,13 +36,13 @@ const GameBoard: FC<GameBoardProps> = ({
   currentRound,
   isAttackerDone,
   isRunnerDone,
-  onMoveMade,
   isRoundActive,
   timeLeft,
   isSetupPhase,
   isRunnerPlaced,
   isPlayerEliminated,
   onPlaceChip,
+  onMoveMade,
 }) => {
   const [activeChip, setActiveChip] = useState<Chip | null>(null);
   const [cellSize, setCellSize] = useState(0);
@@ -176,7 +176,6 @@ const GameBoard: FC<GameBoardProps> = ({
                             ? isAdjacentCell(activeChip.coordinates, { x, y })
                             : false
                         }
-                        onCellClick={() => handleCellClick(x, y)}
                         isSetupPhase={isSetupPhase}
                         isHighlighted={
                           isSetupPhase &&
@@ -189,6 +188,7 @@ const GameBoard: FC<GameBoardProps> = ({
                             ))
                         }
                         highlightColor={isRunnerPlaced ? 'attacker' : 'runner'}
+                        onCellClick={() => handleCellClick(x, y)}
                       />
                     ))}
                 </div>

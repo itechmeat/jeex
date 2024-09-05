@@ -12,7 +12,6 @@ import {
   LogEntry,
 } from '@/features/game/types';
 import {
-  convertCoordToXY,
   convertXYToCoord,
   generateGameInitialPlayers,
   recalculateScores,
@@ -229,12 +228,6 @@ const createLogEntry = (state: GameState): LogEntry => {
   };
 };
 
-const generateRandomCoord = (): string => {
-  const row = String.fromCharCode(65 + Math.floor(Math.random() * 10));
-  const col = Math.floor(Math.random() * 10) + 1;
-  return `${row}${col}`;
-};
-
 const convertChipsToPlayerChips = (chips: Chip[]): PlayerChips => {
   if (chips.length === 0) {
     return {
@@ -408,13 +401,13 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
           currentRound={state.currentRound}
           isAttackerDone={state.isAttackerDone}
           isRunnerDone={state.isRunnerDone}
-          onMoveMade={handleMoveMade}
           isRoundActive={isRoundActive}
           timeLeft={timeLeft}
           isSetupPhase={state.isSetupPhase}
           isRunnerPlaced={state.isRunnerPlaced}
-          onPlaceChip={handlePlaceChip}
           isPlayerEliminated={state.isPlayerEliminated}
+          onPlaceChip={handlePlaceChip}
+          onMoveMade={handleMoveMade}
         />
         <GameLog
           logEntries={state.logEntries}
