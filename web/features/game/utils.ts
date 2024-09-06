@@ -129,46 +129,42 @@ export function recalculateScores(players: PlayerChips[]): PlayerChips[] {
     const B = runners.length;
 
     if (R > 0 && B > 0) {
-      let transfer: number;
+      if (R >= B) {
+        // Attackers outnumber or equal runners
+        const basePoints = 5;
+        const multiplier = Math.pow(2, R - 1);
+        const pointsPerRunner = basePoints * multiplier;
+        const totalPoints = B * pointsPerRunner;
+        const pointsPerAttacker = totalPoints / R;
 
-      if (R > B) {
-        // Attackers outnumber runners
-        transfer = Math.min(Math.max((R - B) / B, 1), 10);
         runners.forEach((runner) => {
-          runner.runner_points -= transfer * (R / B);
+          runner.runner_points = Math.max(
+            runner.runner_points - pointsPerRunner,
+            0
+          );
         });
         attackers.forEach((attacker) => {
-          attacker.attacker_points += transfer;
-        });
-      } else if (B > R) {
-        // Runners outnumber attackers
-        transfer = Math.min(Math.max((B - R) / R, 1), 10);
-        attackers.forEach((attacker) => {
-          attacker.attacker_points += transfer * (B / R);
-        });
-        runners.forEach((runner) => {
-          runner.runner_points -= transfer;
+          attacker.attacker_points += pointsPerAttacker;
         });
       } else {
-        // Equal number of attackers and runners
-        attackers.forEach((attacker) => {
-          attacker.attacker_points += 1;
-        });
+        // Runners outnumber attackers
+        const pointsPerAttacker = B * 2;
+
         runners.forEach((runner) => {
-          runner.runner_points -= 1;
+          runner.runner_points = Math.max(runner.runner_points - 2, 0);
+        });
+        attackers.forEach((attacker) => {
+          attacker.attacker_points += pointsPerAttacker;
         });
       }
     }
   });
 
-  // Round scores and ensure non-negativity
+  // Round scores to two decimal places
   return players.map((player) => ({
     ...player,
-    attacker_points: Math.max(
-      Math.round(player.attacker_points * 100) / 100,
-      0
-    ),
-    runner_points: Math.max(Math.round(player.runner_points * 100) / 100, 0),
+    attacker_points: Math.round(player.attacker_points * 100) / 100,
+    runner_points: Math.round(player.runner_points * 100) / 100,
   }));
 }
 

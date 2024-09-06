@@ -56,3 +56,36 @@ body {
 .link {
   color: #64a9f2;
 }
+
+.text-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+.text-content h1 {
+  margin: 40px 0 16px;
+  font-size: 32px;
+}
+.text-content ol {
+  padding-left: 20px;
+}
+.text-content li {
+  margin-bottom: 15px;
+}
+.text-content ul {
+  padding-left: 20px;
+  list-style-type: disc;
+}
+.text-content strong {
+  color: #2980b9;
+}
+.text-content p {
+  margin-top: 15px;
+}
+.text-content ol > li > ol {
+  list-style-type: lower-alpha;
+  padding-left: 20px;
+}
+.text-content ol > li > ol > li {
+  margin-bottom: 5px;
+}

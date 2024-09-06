@@ -74,7 +74,7 @@ const GameLog: React.FC<GameLogProps> = ({ logEntries, playersCount }) => {
             )}
           >
             {points > 0 ? '+' : ''}
-            {points.toFixed(2)}
+            {Math.abs(points).toFixed(2)}
           </span>
         )}
       </div>
@@ -114,8 +114,8 @@ const GameLog: React.FC<GameLogProps> = ({ logEntries, playersCount }) => {
                 title={`You attacked a cell with ${
                   entry.attackerMove.runners
                 } runners and ${
-                  entry.attackerMove.attackers
-                } other attackers. Each attacker gained ${entry.attackerMove.pointsGained.toFixed(
+                  entry.attackerMove.attackers - 1
+                } other attackers. Your attacker gained ${entry.attackerMove.pointsGained.toFixed(
                   2
                 )} points here.`}
               >
@@ -125,20 +125,19 @@ const GameLog: React.FC<GameLogProps> = ({ logEntries, playersCount }) => {
                   points={entry.attackerMove.pointsGained}
                 />
               </td>
-
               <td
-                title={`ou also retreated to a cell with ${
-                  entry.runnerMove.runners
-                } runners and ${
+                title={`Your runner moved to a cell with ${
+                  entry.runnerMove.runners - 1
+                } other runners and ${
                   entry.runnerMove.attackers
-                } attackers, where each runner lost ${entry.runnerMove.pointsLost.toFixed(
-                  2
-                )} points.`}
+                } attackers, where it lost ${Math.abs(
+                  entry.runnerMove.pointsLost
+                ).toFixed(2)} points.`}
               >
                 <Stat
                   attackers={entry.runnerMove.attackers}
                   runners={entry.runnerMove.runners}
-                  points={entry.runnerMove.pointsLost * -1}
+                  points={-entry.runnerMove.pointsLost}
                 />
               </td>
             </tr>

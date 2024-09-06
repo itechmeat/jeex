@@ -24,6 +24,13 @@ export default function DashboardFeature() {
             exhilarating game
           </p>
 
+          <p style={{ color: '#64a9f2' }}>
+            We recommend newcomers familiarize themselves with the game rules in{' '}
+            <Link href="/rules">🇬🇧 English</Link>,{' '}
+            <Link href="/rules/rs">🇷🇸 Serbian</Link> or{' '}
+            <Link href="/rules/ru">🇷🇺 Russian</Link>.
+          </p>
+
           <div className="py-6">
             <Link href="/games/demo" className="btn rounded-btn btnPrimary">
               Start the Game

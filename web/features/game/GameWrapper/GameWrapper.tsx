@@ -26,6 +26,7 @@ import {
   ROUND_DURATION,
   TOTAL_ROUNDS,
 } from '../constants';
+import Link from 'next/link';
 
 interface GameState {
   playerChips: Chip[];
@@ -417,6 +418,14 @@ const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
           currentRound={state.currentRound}
           playersCount={GAMERS_COUNT}
         />
+
+        <div className="max-w-xl mx-auto py-6 sm:px-6 lg:px-8 text-center">
+          <p style={{ color: '#64a9f2', fontSize: '12px' }}>
+            Rules in <Link href="/rules">🇬🇧 English</Link>,{' '}
+            <Link href="/rules/rs">🇷🇸 Serbian</Link> and{' '}
+            <Link href="/rules/ru">🇷🇺 Russian</Link>.
+          </p>
+        </div>
       </div>
     );
   }, [
