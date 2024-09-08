@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/jeex.json`.
  */
 export type Jeex = {
-  "address": "24hZ5Q7LzpcVDAJmTwnubZJEARqNZrMBdzBwhbmZ5hsg",
+  "address": "Gkspqei1iisV5gbqiTw78henHkLbcaKCFKdbmTTpFmcF",
   "metadata": {
     "name": "jeex",
     "version": "0.1.0",
