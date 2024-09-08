@@ -3,391 +3,259 @@ import { Program } from '@coral-xyz/anchor';
 import { Jeex } from '../target/types/jeex';
 import { expect } from 'chai';
 
+jest.setTimeout(60000); // Увеличиваем глобальный timeout до 60 секунд
+
 describe('jeex', () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
   const program = anchor.workspace.Jeex as Program<Jeex>;
+  const player = anchor.web3.Keypair.generate();
+
+  // Функция для аирдропа SOL
+  async function airdropSol(address: anchor.web3.PublicKey, amount: number) {
+    const signature = await provider.connection.requestAirdrop(
+      address,
+      amount * anchor.web3.LAMPORTS_PER_SOL
+    );
+    await provider.connection.confirmTransaction(signature);
+  }
+
+  // Выполняем аирдроп перед каждым тестом
+  beforeEach(async () => {
+    await airdropSol(player.publicKey, 10);
+  });
+
+  async function setupGame(
+    program: Program<Jeex>,
+    player: anchor.web3.Keypair
+  ) {
+    const gameKeypair = anchor.web3.Keypair.generate();
+
+    try {
+      await program.methods
+        .setupGame()
+        .accounts({
+          game: gameKeypair.publicKey,
+          player: player.publicKey,
+          system_program: anchor.web3.SystemProgram.programId,
+        })
+        .signers([gameKeypair, player])
+        .rpc();
+    } catch (error) {
+      console.error('Error in setupGame:', error);
+      throw error;
+    }
+
+    return gameKeypair;
+  }
+
+  async function placeChips(
+    program: Program<Jeex>,
+    game: anchor.web3.Keypair,
+    player: anchor.web3.Keypair,
+    attackerTile: { row: number; column: number },
+    runnerTile: { row: number; column: number }
+  ) {
+    console.log(`Placing chips for player ${player.publicKey.toString()}:`);
+    console.log(`Attacker tile: (${attackerTile.row}, ${attackerTile.column})`);
+    console.log(`Runner tile: (${runnerTile.row}, ${runnerTile.column})`);
+    try {
+      await program.methods
+        .placeChips(attackerTile, runnerTile)
+        .accounts({
+          game: game.publicKey,
+          player: player.publicKey,
+        })
+        .signers([player])
+        .rpc();
+      console.log('Chips placed successfully');
+    } catch (error) {
+      console.error('Error in placeChips:', error);
+      throw error;
+    }
+  }
 
   async function play(
     program: Program<Jeex>,
-    game,
-    player,
-    tile,
-    expectedTurn,
-    expectedGameState,
-    expectedBoard
+    game: anchor.web3.Keypair,
+    player: anchor.web3.Keypair,
+    attackerMove: { row: number; column: number },
+    runnerMove: { row: number; column: number }
   ) {
-    await program.methods
-      .play(tile)
-      .accounts({
-        player: player.publicKey,
-        game,
-      })
-      .signers(player instanceof (anchor.Wallet as any) ? [] : [player])
-      .rpc();
-
-    const gameState = await program.account.game.fetch(game);
-    expect(gameState.turn).to.equal(expectedTurn);
-    expect(gameState.state).to.eql(expectedGameState);
-    expect(gameState.board).to.eql(expectedBoard);
+    try {
+      await program.methods
+        .play(attackerMove, runnerMove)
+        .accounts({
+          game: game.publicKey,
+          player: player.publicKey,
+        })
+        .signers([player])
+        .rpc();
+    } catch (error) {
+      console.error('Error in play:', error);
+      throw error;
+    }
   }
 
-  it('setup game!', async () => {
-    const gameKeypair = anchor.web3.Keypair.generate();
-    const playerOne = (program.provider as anchor.AnchorProvider).wallet;
-    const playerTwo = anchor.web3.Keypair.generate();
-
-    await program.methods
-      .setupGame(playerTwo.publicKey)
-      .accounts({
-        game: gameKeypair.publicKey,
-        playerOne: playerOne.publicKey,
-      })
-      .signers([gameKeypair])
-      .rpc();
+  it('setup game', async () => {
+    console.log('Setting up game...');
+    const gameKeypair = await setupGame(program, player);
 
     const gameState = await program.account.game.fetch(gameKeypair.publicKey);
-    expect(gameState.turn).to.equal(1);
-    expect(gameState.players).to.eql([
-      playerOne.publicKey,
-      playerTwo.publicKey,
-    ]);
-    expect(gameState.state).to.eql({ active: {} });
-    expect(gameState.board).to.eql([
-      [null, null, null],
-      [null, null, null],
-      [null, null, null],
-    ]);
+    console.log('Game state after setup:', gameState);
+
+    expect(gameState.playerCount).to.equal(1);
+    expect(gameState.currentRound).to.equal(0);
+    expect(gameState.state).to.equal(1); // PlacingChips
+    expect(gameState.board).to.eql(new Array(200).fill(0));
   });
 
-  it('player one wins', async () => {
-    const gameKeypair = anchor.web3.Keypair.generate();
-    const playerOne = (program.provider as anchor.AnchorProvider).wallet;
-    const playerTwo = anchor.web3.Keypair.generate();
+  it('place chips', async () => {
+    console.log('Setting up game for place chips test...');
+    const gameKeypair = await setupGame(program, player);
 
-    await program.methods
-      .setupGame(playerTwo.publicKey)
-      .accounts({
-        game: gameKeypair.publicKey,
-        playerOne: playerOne.publicKey,
-      })
-      .signers([gameKeypair])
-      .rpc();
-
-    const gameState = await program.account.game.fetch(gameKeypair.publicKey);
-    expect(gameState.turn).to.equal(1);
-    expect(gameState.players).to.eql([
-      playerOne.publicKey,
-      playerTwo.publicKey,
-    ]);
-    expect(gameState.state).to.eql({ active: {} });
-    expect(gameState.board).to.eql([
-      [null, null, null],
-      [null, null, null],
-      [null, null, null],
-    ]);
-
-    await play(
+    console.log('Placing chips...');
+    await placeChips(
       program,
-      gameKeypair.publicKey,
-      playerOne,
+      gameKeypair,
+      player,
       { row: 0, column: 0 },
-      2,
-      { active: {} },
-      [
-        [{ x: {} }, null, null],
-        [null, null, null],
-        [null, null, null],
-      ]
+      { row: 9, column: 9 }
     );
 
-    await play(
-      program,
-      gameKeypair.publicKey,
-      playerTwo,
-      { row: 1, column: 1 },
-      3,
-      { active: {} },
-      [
-        [{ x: {} }, null, null],
-        [null, { o: {} }, null],
-        [null, null, null],
-      ]
-    );
+    console.log('Fetching game state...');
+    const gameState = await program.account.game.fetch(gameKeypair.publicKey);
+    console.log('Game state:', gameState);
 
-    await play(
-      program,
-      gameKeypair.publicKey,
-      playerOne,
-      { row: 0, column: 1 },
-      4,
-      { active: {} },
-      [
-        [{ x: {} }, { x: {} }, null],
-        [null, { o: {} }, null],
-        [null, null, null],
-      ]
-    );
+    expect(gameState.playerCount).to.equal(2);
+    expect(gameState.state).to.equal(1); // PlacingChips
 
-    await play(
-      program,
-      gameKeypair.publicKey,
-      playerTwo,
-      { row: 2, column: 0 },
-      5,
-      { active: {} },
-      [
-        [{ x: {} }, { x: {} }, null],
-        [null, { o: {} }, null],
-        [{ o: {} }, null, null],
-      ]
-    );
+    // Проверяем, что фишки размещены правильно
+    const attackerCell = gameState.board[0];
+    const runnerCell = gameState.board[199];
 
-    await play(
-      program,
-      gameKeypair.publicKey,
-      playerOne,
-      { row: 0, column: 2 },
-      5,
-      { won: { winner: playerOne.publicKey } },
-      [
-        [{ x: {} }, { x: {} }, { x: {} }],
-        [null, { o: {} }, null],
-        [{ o: {} }, null, null],
-      ]
-    );
+    console.log('Attacker cell:', attackerCell);
+    console.log('Runner cell:', runnerCell);
+
+    expect(attackerCell).to.equal(2); // Проверяем, что второй бит установлен для атакующей фишки
+    expect(runnerCell).to.equal(2); // Проверяем, что второй бит установлен для убегающей фишки
   });
 
-  it('tie game', async () => {
-    const gameKeypair = anchor.web3.Keypair.generate();
-    const playerOne = (program.provider as anchor.AnchorProvider).wallet;
-    const playerTwo = anchor.web3.Keypair.generate();
+  it('play game', async () => {
+    jest.setTimeout(30000); // Увеличиваем timeout только для этого теста
 
-    await program.methods
-      .setupGame(playerTwo.publicKey)
-      .accounts({
-        game: gameKeypair.publicKey,
-        playerOne: playerOne.publicKey,
-      })
-      .signers([gameKeypair])
-      .rpc();
+    console.log('Setting up game...');
+    const gameKeypair = await setupGame(program, player);
 
-    const gameState = await program.account.game.fetch(gameKeypair.publicKey);
-    expect(gameState.turn).to.equal(1);
-    expect(gameState.players).to.eql([
-      playerOne.publicKey,
-      playerTwo.publicKey,
-    ]);
-    expect(gameState.state).to.eql({ active: {} });
-    expect(gameState.board).to.eql([
-      [null, null, null],
-      [null, null, null],
-      [null, null, null],
-    ]);
-
-    await play(
+    console.log('Placing chips for main player...');
+    await placeChips(
       program,
-      gameKeypair.publicKey,
-      playerOne,
+      gameKeypair,
+      player,
       { row: 0, column: 0 },
-      2,
-      { active: {} },
-      [
-        [{ x: {} }, null, null],
-        [null, null, null],
-        [null, null, null],
-      ]
+      { row: 9, column: 9 }
     );
 
-    await play(
-      program,
-      gameKeypair.publicKey,
-      playerTwo,
-      { row: 1, column: 1 },
-      3,
-      { active: {} },
-      [
-        [{ x: {} }, null, null],
-        [null, { o: {} }, null],
-        [null, null, null],
-      ]
-    );
+    console.log('Simulating placing chips for other players...');
+    for (let i = 1; i < 16; i++) {
+      console.log(`Placing chips for player ${i}...`);
+      const otherPlayer = anchor.web3.Keypair.generate();
+      await airdropSol(otherPlayer.publicKey, 1);
+      const attackerTile = { row: i % 5, column: i % 5 };
+      const runnerTile = { row: (i + 1) % 5, column: (i + 2) % 5 };
 
-    await play(
-      program,
-      gameKeypair.publicKey,
-      playerOne,
-      { row: 2, column: 0 },
-      4,
-      { active: {} },
-      [
-        [{ x: {} }, null, null],
-        [null, { o: {} }, null],
-        [{ x: {} }, null, null],
-      ]
-    );
+      try {
+        await placeChips(
+          program,
+          gameKeypair,
+          otherPlayer,
+          attackerTile,
+          runnerTile
+        );
+      } catch (error) {
+        console.error(`Error placing chips for player ${i}:`, error);
+        // Продолжаем выполнение цикла, даже если произошла ошибка
+      }
+    }
 
-    await play(
-      program,
-      gameKeypair.publicKey,
-      playerTwo,
-      { row: 1, column: 0 },
-      5,
-      { active: {} },
-      [
-        [{ x: {} }, null, null],
-        [{ o: {} }, { o: {} }, null],
-        [{ x: {} }, null, null],
-      ]
-    );
+    console.log('Playing the game...');
+    try {
+      await play(
+        program,
+        gameKeypair,
+        player,
+        { row: 1, column: 1 },
+        { row: 8, column: 8 }
+      );
+    } catch (error) {
+      console.error('Error playing the game:', error);
+      throw error;
+    }
 
-    await play(
-      program,
-      gameKeypair.publicKey,
-      playerOne,
-      { row: 1, column: 2 },
-      6,
-      { active: {} },
-      [
-        [{ x: {} }, null, null],
-        [{ o: {} }, { o: {} }, { x: {} }],
-        [{ x: {} }, null, null],
-      ]
-    );
+    console.log('Fetching final game state...');
+    const gameState = await program.account.game.fetch(gameKeypair.publicKey);
+    console.log('Final game state:', gameState);
 
-    await play(
-      program,
-      gameKeypair.publicKey,
-      playerTwo,
-      { row: 0, column: 1 },
-      7,
-      { active: {} },
-      [
-        [{ x: {} }, { o: {} }, null],
-        [{ o: {} }, { o: {} }, { x: {} }],
-        [{ x: {} }, null, null],
-      ]
-    );
+    expect(gameState.currentRound).to.equal(2);
+    expect(gameState.state).to.equal(2); // Active
 
-    await play(
-      program,
-      gameKeypair.publicKey,
-      playerOne,
-      { row: 2, column: 1 },
-      8,
-      { active: {} },
-      [
-        [{ x: {} }, { o: {} }, null],
-        [{ o: {} }, { o: {} }, { x: {} }],
-        [{ x: {} }, { x: {} }, null],
-      ]
-    );
-
-    await play(
-      program,
-      gameKeypair.publicKey,
-      playerTwo,
-      { row: 2, column: 2 },
-      9,
-      { active: {} },
-      [
-        [{ x: {} }, { o: {} }, null],
-        [{ o: {} }, { o: {} }, { x: {} }],
-        [{ x: {} }, { x: {} }, { o: {} }],
-      ]
-    );
-
-    await play(
-      program,
-      gameKeypair.publicKey,
-      playerOne,
-      { row: 0, column: 2 },
-      9,
-      { tie: {} },
-      [
-        [{ x: {} }, { o: {} }, { x: {} }],
-        [{ o: {} }, { o: {} }, { x: {} }],
-        [{ x: {} }, { x: {} }, { o: {} }],
-      ]
-    );
+    // Проверяем, что фишки переместились
+    expect(gameState.board[0]).to.equal(0); // Атакующая фишка должна уйти с начальной позиции
+    expect(gameState.board[199]).to.equal(0); // Убегающая фишка должна уйти с начальной позиции
+    expect(gameState.board[22]).to.not.equal(0); // Новая позиция атакующей фишки
+    expect(gameState.board[177]).to.not.equal(0); // Новая позиция убегающей фишки
   });
 
   it('invalid move: tile out of bounds', async () => {
-    const gameKeypair = anchor.web3.Keypair.generate();
-    const playerOne = (program.provider as anchor.AnchorProvider).wallet;
-    const playerTwo = anchor.web3.Keypair.generate();
-
-    await program.methods
-      .setupGame(playerTwo.publicKey)
-      .accounts({
-        game: gameKeypair.publicKey,
-        playerOne: playerOne.publicKey,
-      })
-      .signers([gameKeypair])
-      .rpc();
+    const gameKeypair = await setupGame(program, player);
 
     try {
-      await play(
+      await placeChips(
         program,
-        gameKeypair.publicKey,
-        playerOne,
-        { row: 5, column: 1 },
-        1,
-        { active: {} },
-        [
-          [null, null, null],
-          [null, null, null],
-          [null, null, null],
-        ]
+        gameKeypair,
+        player,
+        { row: 10, column: 0 },
+        { row: 0, column: 0 }
       );
       expect.fail("should've failed but didn't ");
-    } catch (_err) {
-      expect(_err).to.be.instanceOf(anchor.AnchorError);
-      const err: anchor.AnchorError = _err;
-      expect(err.error.errorCode.number).to.equal(6000);
+    } catch (error) {
+      expect(error).to.be.instanceOf(anchor.AnchorError);
+      const err = error as anchor.AnchorError;
+      expect(err.error.errorCode.code).to.equal('InvalidTile');
     }
   });
 
-  it('invalid move: wrong player', async () => {
-    const gameKeypair = anchor.web3.Keypair.generate();
-    const playerOne = (program.provider as anchor.AnchorProvider).wallet;
-    const playerTwo = anchor.web3.Keypair.generate();
-
-    await program.methods
-      .setupGame(playerTwo.publicKey)
-      .accounts({
-        game: gameKeypair.publicKey,
-        playerOne: playerOne.publicKey,
-      })
-      .signers([gameKeypair])
-      .rpc();
+  it('invalid move: same tile for both chips', async () => {
+    const gameKeypair = await setupGame(program, player);
 
     try {
-      await play(
+      await placeChips(
         program,
-        gameKeypair.publicKey,
-        playerTwo,
+        gameKeypair,
+        player,
         { row: 0, column: 0 },
-        1,
-        { active: {} },
-        [
-          [null, null, null],
-          [null, null, null],
-          [null, null, null],
-        ]
+        { row: 0, column: 0 }
       );
       expect.fail("should've failed but didn't ");
-    } catch (_err) {
-      expect(_err).to.be.instanceOf(anchor.AnchorError);
-      const err: anchor.AnchorError = _err;
-      expect(err.error.errorCode.code).to.equal('NotPlayersTurn');
-      expect(err.error.errorCode.number).to.equal(6003);
-      expect(err.program.equals(program.programId)).is.true;
-      expect(err.error.comparedValues).to.deep.equal([
-        playerOne.publicKey,
-        playerTwo.publicKey,
-      ]);
+    } catch (error) {
+      expect(error).to.be.instanceOf(anchor.AnchorError);
+      const err = error as anchor.AnchorError;
+      expect(err.error.errorCode.code).to.equal('SameTileForBothChips');
     }
   });
+
+  // Вспомогательные функции
+  function isValidTile(tile: { row: number; column: number }): boolean {
+    return (
+      tile.row >= 0 && tile.row < 10 && tile.column >= 0 && tile.column < 10
+    );
+  }
+
+  function areSameTiles(
+    tile1: { row: number; column: number },
+    tile2: { row: number; column: number }
+  ): boolean {
+    return tile1.row === tile2.row && tile1.column === tile2.column;
+  }
 });

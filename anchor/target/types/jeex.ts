@@ -14,6 +14,47 @@ export type Jeex = {
   },
   "instructions": [
     {
+      "name": "placeChips",
+      "discriminator": [
+        185,
+        164,
+        216,
+        73,
+        145,
+        23,
+        130,
+        62
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "writable": true
+        },
+        {
+          "name": "player",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "attacker",
+          "type": {
+            "defined": {
+              "name": "tile"
+            }
+          }
+        },
+        {
+          "name": "runner",
+          "type": {
+            "defined": {
+              "name": "tile"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "play",
       "discriminator": [
         213,
@@ -37,7 +78,15 @@ export type Jeex = {
       ],
       "args": [
         {
-          "name": "tile",
+          "name": "attackerMove",
+          "type": {
+            "defined": {
+              "name": "tile"
+            }
+          }
+        },
+        {
+          "name": "runnerMove",
           "type": {
             "defined": {
               "name": "tile"
@@ -65,7 +114,7 @@ export type Jeex = {
           "signer": true
         },
         {
-          "name": "playerOne",
+          "name": "player",
           "writable": true,
           "signer": true
         },
@@ -74,12 +123,7 @@ export type Jeex = {
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": [
-        {
-          "name": "playerTwo",
-          "type": "pubkey"
-        }
-      ]
+      "args": []
     }
   ],
   "accounts": [
@@ -100,23 +144,31 @@ export type Jeex = {
   "errors": [
     {
       "code": 6000,
-      "name": "tileOutOfBounds"
+      "name": "invalidTile"
     },
     {
       "code": 6001,
-      "name": "tileAlreadySet"
+      "name": "sameTileForBothChips"
     },
     {
       "code": 6002,
-      "name": "gameAlreadyOver"
+      "name": "gameAlreadyStarted"
     },
     {
       "code": 6003,
-      "name": "notPlayersTurn"
+      "name": "invalidGameState"
     },
     {
       "code": 6004,
-      "name": "gameAlreadyStarted"
+      "name": "gameNotActive"
+    },
+    {
+      "code": 6005,
+      "name": "maxPlayersReached"
+    },
+    {
+      "code": 6006,
+      "name": "playerNotFound"
     }
   ],
   "types": [
@@ -130,78 +182,30 @@ export type Jeex = {
             "type": {
               "array": [
                 "pubkey",
-                2
+                16
               ]
             }
           },
           {
-            "name": "turn",
+            "name": "playerCount",
+            "type": "u8"
+          },
+          {
+            "name": "currentRound",
             "type": "u8"
           },
           {
             "name": "board",
             "type": {
               "array": [
-                {
-                  "array": [
-                    {
-                      "option": {
-                        "defined": {
-                          "name": "sign"
-                        }
-                      }
-                    },
-                    3
-                  ]
-                },
-                3
+                "u8",
+                200
               ]
             }
           },
           {
             "name": "state",
-            "type": {
-              "defined": {
-                "name": "gameState"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "gameState",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "active"
-          },
-          {
-            "name": "tie"
-          },
-          {
-            "name": "won",
-            "fields": [
-              {
-                "name": "winner",
-                "type": "pubkey"
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "name": "sign",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "x"
-          },
-          {
-            "name": "o"
+            "type": "u8"
           }
         ]
       }
