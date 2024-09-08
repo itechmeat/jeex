@@ -1,16 +1,16 @@
 import * as anchor from '@coral-xyz/anchor';
 import { Program } from '@coral-xyz/anchor';
-import { Jeex } from '../target/types/jeex';
+import { TicTacToe } from '../target/types/tic_tac_toe';
 import { expect } from 'chai';
 
-describe('jeex', () => {
+describe('tic_tac_toe', () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
-  const program = anchor.workspace.Jeex as Program<Jeex>;
+  const program = anchor.workspace.TicTacToe as Program<TicTacToe>;
 
   async function play(
-    program: Program<Jeex>,
+    program: Program<TicTacToe>,
     game,
     player,
     tile,

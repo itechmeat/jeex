@@ -2,10 +2,10 @@ use anchor_lang::prelude::*;
 use num_derive::*;
 use num_traits::*;
 
-declare_id!("24hZ5Q7LzpcVDAJmTwnubZJEARqNZrMBdzBwhbmZ5hsg");
+declare_id!("7JJLT2Repd6HzTxPXLroWSGZffmJWkJDz2VgCNQaPGDe");
 
 #[program]
-pub mod jeex {
+pub mod tic_tac_toe {
     use super::*;
 
     pub fn setup_game(ctx: Context<SetupGame>, player_two: Pubkey) -> Result<()> {
@@ -18,7 +18,7 @@ pub mod jeex {
         require_keys_eq!(
             game.current_player(),
             ctx.accounts.player.key(),
-            JeexError::NotPlayersTurn
+            TicTacToeError::NotPlayersTurn
         );
 
         game.play(&tile)
@@ -81,7 +81,7 @@ impl Game {
     pub const MAXIMUM_SIZE: usize = (32 * 2) + 1 + (9 * (1 + 1)) + (32 + 1);
 
     pub fn start(&mut self, players: [Pubkey; 2]) -> Result<()> {
-        require_eq!(self.turn, 0, JeexError::GameAlreadyStarted);
+        require_eq!(self.turn, 0, TicTacToeError::GameAlreadyStarted);
         self.players = players;
         self.turn = 1;
         Ok(())
@@ -100,20 +100,20 @@ impl Game {
     }
 
     pub fn play(&mut self, tile: &Tile) -> Result<()> {
-        require!(self.is_active(), JeexError::GameAlreadyOver);
+        require!(self.is_active(), TicTacToeError::GameAlreadyOver);
 
         match tile {
             tile @ Tile {
                 row: 0..=2,
                 column: 0..=2,
             } => match self.board[tile.row as usize][tile.column as usize] {
-                Some(_) => return Err(JeexError::TileAlreadySet.into()),
+                Some(_) => return Err(TicTacToeError::TileAlreadySet.into()),
                 None => {
                     self.board[tile.row as usize][tile.column as usize] =
                         Some(Sign::from_usize(self.current_player_index()).unwrap());
                 }
             },
-            _ => return Err(JeexError::TileOutOfBounds.into()),
+            _ => return Err(TicTacToeError::TileOutOfBounds.into()),
         }
 
         self.update_state();
@@ -178,7 +178,7 @@ impl Game {
 }
 
 #[error_code]
-pub enum JeexError {
+pub enum TicTacToeError {
     TileOutOfBounds,
     TileAlreadySet,
     GameAlreadyOver,
