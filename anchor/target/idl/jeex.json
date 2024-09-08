@@ -1,0 +1,220 @@
+{
+  "address": "24hZ5Q7LzpcVDAJmTwnubZJEARqNZrMBdzBwhbmZ5hsg",
+  "metadata": {
+    "name": "jeex",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "play",
+      "discriminator": [
+        213,
+        157,
+        193,
+        142,
+        228,
+        56,
+        248,
+        150
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "writable": true
+        },
+        {
+          "name": "player",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "tile",
+          "type": {
+            "defined": {
+              "name": "Tile"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "setup_game",
+      "discriminator": [
+        180,
+        218,
+        128,
+        75,
+        58,
+        222,
+        35,
+        82
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "player_one",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "player_two",
+          "type": "pubkey"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Game",
+      "discriminator": [
+        27,
+        90,
+        166,
+        125,
+        74,
+        100,
+        121,
+        18
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "TileOutOfBounds"
+    },
+    {
+      "code": 6001,
+      "name": "TileAlreadySet"
+    },
+    {
+      "code": 6002,
+      "name": "GameAlreadyOver"
+    },
+    {
+      "code": 6003,
+      "name": "NotPlayersTurn"
+    },
+    {
+      "code": 6004,
+      "name": "GameAlreadyStarted"
+    }
+  ],
+  "types": [
+    {
+      "name": "Game",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "players",
+            "type": {
+              "array": [
+                "pubkey",
+                2
+              ]
+            }
+          },
+          {
+            "name": "turn",
+            "type": "u8"
+          },
+          {
+            "name": "board",
+            "type": {
+              "array": [
+                {
+                  "array": [
+                    {
+                      "option": {
+                        "defined": {
+                          "name": "Sign"
+                        }
+                      }
+                    },
+                    3
+                  ]
+                },
+                3
+              ]
+            }
+          },
+          {
+            "name": "state",
+            "type": {
+              "defined": {
+                "name": "GameState"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "GameState",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Tie"
+          },
+          {
+            "name": "Won",
+            "fields": [
+              {
+                "name": "winner",
+                "type": "pubkey"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sign",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "X"
+          },
+          {
+            "name": "O"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tile",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "row",
+            "type": "u8"
+          },
+          {
+            "name": "column",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}
