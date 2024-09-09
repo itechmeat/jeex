@@ -14,16 +14,16 @@ export type Jeex = {
   },
   "instructions": [
     {
-      "name": "placeChips",
+      "name": "setScore",
       "discriminator": [
-        185,
-        164,
-        216,
-        73,
-        145,
-        23,
-        130,
-        62
+        218,
+        167,
+        25,
+        121,
+        208,
+        190,
+        8,
+        87
       ],
       "accounts": [
         {
@@ -37,61 +37,8 @@ export type Jeex = {
       ],
       "args": [
         {
-          "name": "attacker",
-          "type": {
-            "defined": {
-              "name": "tile"
-            }
-          }
-        },
-        {
-          "name": "runner",
-          "type": {
-            "defined": {
-              "name": "tile"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "play",
-      "discriminator": [
-        213,
-        157,
-        193,
-        142,
-        228,
-        56,
-        248,
-        150
-      ],
-      "accounts": [
-        {
-          "name": "game",
-          "writable": true
-        },
-        {
-          "name": "player",
-          "signer": true
-        }
-      ],
-      "args": [
-        {
-          "name": "attackerMove",
-          "type": {
-            "defined": {
-              "name": "tile"
-            }
-          }
-        },
-        {
-          "name": "runnerMove",
-          "type": {
-            "defined": {
-              "name": "tile"
-            }
-          }
+          "name": "score",
+          "type": "u32"
         }
       ]
     },
@@ -110,17 +57,11 @@ export type Jeex = {
       "accounts": [
         {
           "name": "game",
-          "writable": true,
-          "signer": true
+          "writable": true
         },
         {
           "name": "player",
-          "writable": true,
           "signer": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
         }
       ],
       "args": []
@@ -141,36 +82,6 @@ export type Jeex = {
       ]
     }
   ],
-  "errors": [
-    {
-      "code": 6000,
-      "name": "invalidTile"
-    },
-    {
-      "code": 6001,
-      "name": "sameTileForBothChips"
-    },
-    {
-      "code": 6002,
-      "name": "gameAlreadyStarted"
-    },
-    {
-      "code": 6003,
-      "name": "invalidGameState"
-    },
-    {
-      "code": 6004,
-      "name": "gameNotActive"
-    },
-    {
-      "code": 6005,
-      "name": "maxPlayersReached"
-    },
-    {
-      "code": 6006,
-      "name": "playerNotFound"
-    }
-  ],
   "types": [
     {
       "name": "game",
@@ -178,50 +89,12 @@ export type Jeex = {
         "kind": "struct",
         "fields": [
           {
-            "name": "players",
-            "type": {
-              "array": [
-                "pubkey",
-                16
-              ]
-            }
+            "name": "player",
+            "type": "pubkey"
           },
           {
-            "name": "playerCount",
-            "type": "u8"
-          },
-          {
-            "name": "currentRound",
-            "type": "u8"
-          },
-          {
-            "name": "board",
-            "type": {
-              "array": [
-                "u8",
-                200
-              ]
-            }
-          },
-          {
-            "name": "state",
-            "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "tile",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "row",
-            "type": "u8"
-          },
-          {
-            "name": "column",
-            "type": "u8"
+            "name": "score",
+            "type": "u32"
           }
         ]
       }
