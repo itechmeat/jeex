@@ -100,3 +100,7 @@ npm run build
 ```bash
 tuna http 3000 --subdomain=jeex --location=nl
 ```
+
+### Blink
+
+https://dial.to/developer?url=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Factions%2Fgame&cluster=devnet

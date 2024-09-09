@@ -9,10 +9,14 @@ export async function generateMetadata() {
   return {
     title: 'JEEX - Every square a battlefield, every move a strategy!',
     openGraph: {
-      images: ['https://jeex.io/images/logo.png'],
+      images: ['https://jeex.org/images/jeex-cover.jpg'],
+      title: 'JEEX - Every square a battlefield, every move a strategy!',
+      description:
+        'JEEX is a dynamic multiplayer online game in the strategy and tactics genre.',
     },
     other: {
       'dscvr:canvas:version': 'vNext',
+      'twitter:site': '@techmeat',
     },
   };
 }

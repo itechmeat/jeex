@@ -21,10 +21,7 @@ export const GET = (req: Request) => {
   const baseHref = new URL(`/games`, requestUrl.origin).toString();
 
   const payload: ActionGetResponse = {
-    icon: new URL(
-      '/android-chrome-512x512.png',
-      new URL(req.url).origin
-    ).toString(),
+    icon: new URL('/images/logo.png', new URL(req.url).origin).toString(),
     title: 'Play with JEEX',
     description:
       'JEEX is a dynamic multiplayer online game in the strategy and tactics genre.',
@@ -32,11 +29,11 @@ export const GET = (req: Request) => {
     links: {
       actions: [
         {
-          label: 'Play JS game',
+          label: 'Single player',
           href: `${baseHref}/demo`,
         },
         {
-          label: 'Play WEB3 game',
+          label: 'WEB3 game',
           href: `${baseHref}/web3`,
         },
       ],
