@@ -1,0 +1,97 @@
+{
+  "address": "Gkspqei1iisV5gbqiTw78henHkLbcaKCFKdbmTTpFmcF",
+  "metadata": {
+    "name": "jeex",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "set_score",
+      "discriminator": [
+        218,
+        167,
+        25,
+        121,
+        208,
+        190,
+        8,
+        87
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "writable": true
+        },
+        {
+          "name": "player",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "score",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "setup_game",
+      "discriminator": [
+        180,
+        218,
+        128,
+        75,
+        58,
+        222,
+        35,
+        82
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "writable": true
+        },
+        {
+          "name": "player",
+          "signer": true
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Game",
+      "discriminator": [
+        27,
+        90,
+        166,
+        125,
+        74,
+        100,
+        121,
+        18
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "Game",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "score",
+            "type": "u32"
+          }
+        ]
+      }
+    }
+  ]
+}

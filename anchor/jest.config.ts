@@ -24,7 +24,8 @@ export default {
   transform: {
     '^.+\\.[tj]s$': ['@swc/jest', swcJestConfig],
   },
+  transformIgnorePatterns: ['/node_modules/(?!(chai)/)'],
   moduleFileExtensions: ['ts', 'js', 'html'],
-  testEnvironment: '',
+  testEnvironment: 'node',
   coverageDirectory: '../coverage/anchor',
 };
