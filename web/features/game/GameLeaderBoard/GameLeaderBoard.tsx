@@ -29,12 +29,12 @@ const GameLeaderBoard: React.FC<GameLeaderBoardProps> = ({
 
   return (
     <div className={styles.leaderBoard}>
-      <h1 className={styles.title}>Game Over</h1>
+      <Eliminated text="Game Over" />
 
       {isPlayerEliminated ? (
         <Eliminated />
       ) : (
-        <p>
+        <p className={styles.placement}>
           Your final position: {playerRank} out of {totalPlayers}
         </p>
       )}

@@ -13,6 +13,11 @@ body {
   color: #fff;
 }
 
+.navbar {
+  max-width: 600px;
+  margin-inline: auto;
+}
+
 .wallet-adapter-button-trigger {
   height: 32px !important;
   border-radius: 32px !important;
