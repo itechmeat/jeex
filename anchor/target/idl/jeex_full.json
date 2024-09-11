@@ -1,0 +1,224 @@
+{
+  "address": "Gkspqei1iisV5gbqiTw78henHkLbcaKCFKdbmTTpFmcF",
+  "metadata": {
+    "name": "jeex_full",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "place_chips",
+      "discriminator": [
+        185,
+        164,
+        216,
+        73,
+        145,
+        23,
+        130,
+        62
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "writable": true
+        },
+        {
+          "name": "player",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "attacker",
+          "type": {
+            "defined": {
+              "name": "Tile"
+            }
+          }
+        },
+        {
+          "name": "runner",
+          "type": {
+            "defined": {
+              "name": "Tile"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "play",
+      "discriminator": [
+        213,
+        157,
+        193,
+        142,
+        228,
+        56,
+        248,
+        150
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "writable": true
+        },
+        {
+          "name": "player",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "attacker_move",
+          "type": {
+            "defined": {
+              "name": "Tile"
+            }
+          }
+        },
+        {
+          "name": "runner_move",
+          "type": {
+            "defined": {
+              "name": "Tile"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "setup_game",
+      "discriminator": [
+        180,
+        218,
+        128,
+        75,
+        58,
+        222,
+        35,
+        82
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Game",
+      "discriminator": [
+        27,
+        90,
+        166,
+        125,
+        74,
+        100,
+        121,
+        18
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidTile"
+    },
+    {
+      "code": 6001,
+      "name": "SameTileForBothChips"
+    },
+    {
+      "code": 6002,
+      "name": "GameAlreadyStarted"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidGameState"
+    },
+    {
+      "code": 6004,
+      "name": "GameNotActive"
+    },
+    {
+      "code": 6005,
+      "name": "MaxPlayersReached"
+    },
+    {
+      "code": 6006,
+      "name": "PlayerNotFound"
+    }
+  ],
+  "types": [
+    {
+      "name": "Game",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "players",
+            "type": {
+              "array": [
+                "pubkey",
+                16
+              ]
+            }
+          },
+          {
+            "name": "player_count",
+            "type": "u8"
+          },
+          {
+            "name": "current_round",
+            "type": "u8"
+          },
+          {
+            "name": "board",
+            "type": {
+              "array": [
+                "u8",
+                200
+              ]
+            }
+          },
+          {
+            "name": "state",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tile",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "row",
+            "type": "u8"
+          },
+          {
+            "name": "column",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}
