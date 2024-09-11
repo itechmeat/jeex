@@ -1,4 +1,4 @@
-import GameWrapper from '@/features/game/GameWrapper/GameWrapper';
+import GameLoginChecker from '@/features/game/GameLoginChecker/GameLoginChecker';
 import { ApiGame } from '@/features/game/types';
 
 export const metadata = {
@@ -14,5 +14,5 @@ export default async function GamePage({ params }: { params: { id: string } }) {
     status: 'active',
   } as ApiGame;
 
-  return <GameWrapper game={game} />;
+  return <GameLoginChecker />;
 }

@@ -256,7 +256,7 @@ const convertChipsToPlayerChips = (chips: Chip[]): PlayerChips => {
 };
 
 interface GameWrapperProps {
-  game: ApiGame;
+  game?: ApiGame;
 }
 
 const GameWrapper: FC<GameWrapperProps> = ({ game }) => {
