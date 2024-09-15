@@ -10,13 +10,13 @@ import styles from './GameLoginChecker.module.scss';
 const GameLoginChecker: FC<PropsWithChildren> = ({ children }) => {
   const wallet = useWallet();
 
-  if (!wallet.publicKey)
-    return (
-      <div className={styles.WalletButtonWrapper}>
-        <p>Please log in to play</p>
-        <WalletButton />
-      </div>
-    );
+  // if (!wallet.publicKey)
+  //   return (
+  //     <div className={styles.WalletButtonWrapper}>
+  //       <p>Please log in to play</p>
+  //       <WalletButton />
+  //     </div>
+  //   );
 
   return <GameWrapper />;
 };
